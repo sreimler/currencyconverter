@@ -3,4 +3,5 @@
     <string name="currency_list">Currency List</string>
     <string name="currency_conversion">Currency Conversion</string>
     <string name="convert">Convert</string>
+    <string name="back_button">Back</string>
 </resources>
