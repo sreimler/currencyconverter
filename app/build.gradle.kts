@@ -1,6 +1,9 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.jetbrainsKotlinPluginSerialization)
 }
 
 android {
@@ -20,10 +23,25 @@ android {
         }
     }
 
+    // Load api key and add to build config
+    val keystoreFile = project.rootProject.file("apikeys.properties")
+    val properties = Properties()
+    properties.load(keystoreFile.inputStream())
+    val apiKeyFreeCurrency = properties.getProperty("API_KEY_FREECURRENCY") ?: ""
+
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        all {
+            android.buildFeatures.buildConfig = true
+
+            buildConfigField(
+                type = "String",
+                name = "API_KEY_FREECURRENCY",
+                value = apiKeyFreeCurrency
+            )
         }
     }
     compileOptions {
@@ -57,6 +75,12 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
+
+    // Retrofit
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.retrofit)
+    implementation(libs.okhttp)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
 
