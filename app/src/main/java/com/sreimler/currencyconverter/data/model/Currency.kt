@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Currencies(
+data class GetCurrenciesResponse(
     val data: Map<String, Currency>
 )
 

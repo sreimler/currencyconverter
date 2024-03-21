@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import com.sreimler.currencyconverter.data.model.Currency
+import com.sreimler.currencyconverter.data.model.ExchangeRate
 import com.sreimler.currencyconverter.viewmodel.CurrencyUiState
 
 
@@ -18,21 +19,21 @@ fun ListScreen(modifier: Modifier = Modifier, uiState: State<CurrencyUiState>) {
         when (val state = uiState.value) {
             is CurrencyUiState.Loading -> {}
             is CurrencyUiState.Error -> {}
-            is CurrencyUiState.Success -> CurrencyList(state.currencies)
+            is CurrencyUiState.Success -> CurrencyList(state.exchangeRates)
         }
     }
 }
 
 @Composable
-fun CurrencyList(currencies: List<Currency>) {
+fun CurrencyList(exchangeRates: List<ExchangeRate>) {
     LazyVerticalGrid(columns = GridCells.Fixed(1)) {
-        items(items = currencies, key = { currency -> currency.symbol }) {
-            CurrencyCard(currency = it)
+        items(items = exchangeRates, key = { exchangeRate -> exchangeRate.currency.code }) { exchangeRate ->
+            CurrencyCard(currency = exchangeRate.currency, rate = exchangeRate.rate)
         }
     }
 }
 
 @Composable
-fun CurrencyCard(currency: Currency) {
-    Text("${currency.name} (${currency.symbol})")
+fun CurrencyCard(currency: Currency, rate: Double) {
+    Text("${currency.name} (${currency.symbol}) $rate")
 }
