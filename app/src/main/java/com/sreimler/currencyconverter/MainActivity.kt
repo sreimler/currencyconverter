@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sreimler.currencyconverter.ui.screens.ConverterScreen
+import com.sreimler.currencyconverter.ui.screens.InfoScreen
 import com.sreimler.currencyconverter.ui.screens.ListScreen
 import com.sreimler.currencyconverter.ui.theme.CurrencyConverterTheme
 import com.sreimler.currencyconverter.viewmodel.CurrencyConverterViewModel
@@ -51,7 +53,8 @@ class MainActivity : ComponentActivity() {
 
 enum class Screen(@StringRes val title: Int) {
     List(title = R.string.currency_list),
-    Converter(title = R.string.app_name)
+    Converter(title = R.string.app_name),
+    Info(title = R.string.info)
 }
 
 @Composable
@@ -66,7 +69,8 @@ fun CurrencyConversionApp() {
             CurrencyConverterTopBar(
                 currentScreen = currentScreen,
                 canNavigateBack = navController.previousBackStackEntry != null,
-                navigateUp = { navController.navigateUp() }
+                navigateUp = { navController.navigateUp() },
+                openInfo = { navController.navigate(Screen.Info.name) }
             )
         },
         floatingActionButton = {
@@ -89,13 +93,19 @@ fun CurrencyConversionApp() {
             composable(route = Screen.Converter.name) {
                 ConverterScreen()
             }
+            composable(route = Screen.Info.name) {
+                InfoScreen()
+            }
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CurrencyConverterTopBar(currentScreen: Screen, canNavigateBack: Boolean, navigateUp: () -> Unit) {
+fun CurrencyConverterTopBar(
+    currentScreen: Screen, canNavigateBack: Boolean, navigateUp: () -> Unit, openInfo: () ->
+    Unit
+) {
     CenterAlignedTopAppBar(
         title = { Text(text = stringResource(currentScreen.title), fontWeight = FontWeight.Bold) },
         navigationIcon = {
@@ -106,6 +116,12 @@ fun CurrencyConverterTopBar(currentScreen: Screen, canNavigateBack: Boolean, nav
                         contentDescription = stringResource(R.string.back_button)
                     )
                 }
+            }
+        },
+        actions = {
+            // RowScope here, so these icons will be placed horizontally
+            IconButton(onClick = openInfo) {
+                Icon(Icons.Filled.Info, contentDescription = null)
             }
         }
     )
