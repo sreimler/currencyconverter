@@ -6,6 +6,11 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinPluginSerialization)
 }
 
+// Version information
+val versionMajor = 0
+val versionMinor = 1
+val versionPatch = 0
+
 android {
     namespace = "com.sreimler.currencyconverter"
     compileSdk = 34
@@ -14,8 +19,8 @@ android {
         applicationId = "com.sreimler.currencyconverter"
         minSdk = 24
         targetSdk = 34
-        versionCode = 3
-        versionName = "0.1"
+        versionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
+        versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
