@@ -1,5 +1,7 @@
 package com.sreimler.currencyconverter.ui.screens
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,9 +11,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.sreimler.currencyconverter.data.CURRENCY_EUR
@@ -41,16 +50,37 @@ fun CurrencyRow(currency: Currency, amount: Double, onChange: (String, Currency)
         Text(
             text = currency.name,
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.align(Alignment.CenterVertically)
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .weight(1f)
         )
 
+        var textFieldValue by remember(key1 = amount) { mutableStateOf(TextFieldValue(df.format(amount))) }
+        val interactionSource = remember { MutableInteractionSource() }
+        val isFocused by interactionSource.collectIsFocusedAsState()
+
+        // Select whole input text when gaining focus
+        LaunchedEffect(isFocused) {
+            val endRange = if (isFocused) textFieldValue.text.length else 0
+
+            textFieldValue = textFieldValue.copy(
+                selection = TextRange(
+                    start = 0,
+                    end = endRange
+                )
+            )
+        }
+
         TextField(
-            value = df.format(amount),
-            onValueChange = { onChange(it, currency) },
+            value = textFieldValue,
+            onValueChange = { value -> onChange(value.text, currency) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
             ),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            interactionSource = interactionSource,
             textStyle = MaterialTheme.typography.headlineLarge.copy(textAlign = TextAlign.End),
             label = { Text(currency.code) }
         )

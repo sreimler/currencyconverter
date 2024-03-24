@@ -36,17 +36,17 @@ class CurrencyConverterViewModel : ViewModel() {
     init {
         getExchangeRates()
 
-        viewModelScope.launch {
-            currencyUiState.collect { state ->
-                when (state) {
-                    CurrencyUiState.Error -> Log.i(CurrencyConverterViewModel::class.java.name, "err")
-                    CurrencyUiState.Loading -> Log.i(CurrencyConverterViewModel::class.java.name, "loading..")
-                    is CurrencyUiState.Success -> Log.i(
-                        CurrencyConverterViewModel::class.java.name, "Received exchange rates:\n${state.exchangeRates}"
-                    )
-                }
-            }
-        }
+        //viewModelScope.launch {
+        //    currencyUiState.collect { state ->
+        //        when (state) {
+        //            CurrencyUiState.Error -> Log.i(CurrencyConverterViewModel::class.java.name, "err")
+        //            CurrencyUiState.Loading -> Log.i(CurrencyConverterViewModel::class.java.name, "loading..")
+        //            is CurrencyUiState.Success -> Log.i(
+        //                CurrencyConverterViewModel::class.java.name, "Received exchange rates:\n${state.exchangeRates}"
+        //            )
+        //        }
+        //    }
+        //}
 
     }
 
@@ -75,6 +75,10 @@ class CurrencyConverterViewModel : ViewModel() {
     }
 
     fun amountChanged(changedAmount: String, amountCurrency: Currency) {
+        Log.i(
+            CurrencyConverterViewModel::class.java.name, "Received new amount $changedAmount for currency " +
+                    amountCurrency.name
+        )
         try {
             val uiState = _currencyUiState.value as CurrencyUiState.Success
 
