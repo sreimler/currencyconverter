@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import com.sreimler.currencyconverter.data.model.Currency
 import com.sreimler.currencyconverter.data.model.ExchangeRate
@@ -14,12 +13,12 @@ import com.sreimler.currencyconverter.viewmodel.CurrencyUiState
 
 
 @Composable
-fun ListScreen(modifier: Modifier = Modifier, uiState: State<CurrencyUiState>) {
+fun ListScreen(modifier: Modifier = Modifier, uiState: CurrencyUiState) {
     Surface(modifier = modifier) {
-        when (val state = uiState.value) {
+        when (uiState) {
             is CurrencyUiState.Loading -> {}
             is CurrencyUiState.Error -> {}
-            is CurrencyUiState.Success -> CurrencyList(state.exchangeRates)
+            is CurrencyUiState.Success -> CurrencyList(uiState.exchangeRates)
         }
     }
 }

@@ -11,9 +11,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -75,7 +75,9 @@ fun CurrencyConversionApp() {
         },
         floatingActionButton = {
             if (currentScreen.name == Screen.List.name) {
-                ConverterFab(onClick = { navController.navigate(Screen.Converter.name) })
+                ConverterFab(onClick = {
+                    navController.navigate(Screen.Converter.name)
+                })
             }
         }
     ) {
@@ -88,10 +90,14 @@ fun CurrencyConversionApp() {
                 .padding(horizontal = 8.dp)
         ) {
             composable(route = Screen.List.name) {
-                ListScreen(uiState = viewModel.currencyUiState.collectAsState())
+                val uiState = viewModel.currencyUiState.collectAsState()
+                ListScreen(uiState = uiState.value)
             }
             composable(route = Screen.Converter.name) {
-                ConverterScreen()
+                val uiState = viewModel.currencyUiState.collectAsState()
+                ConverterScreen(
+                    uiState = uiState.value,
+                    onChange = { amount, currency -> viewModel.amountChanged(amount, currency) })
             }
             composable(route = Screen.Info.name) {
                 InfoScreen()
@@ -129,14 +135,16 @@ fun CurrencyConverterTopBar(
 
 @Composable
 fun ConverterFab(onClick: () -> Unit) {
-    LargeFloatingActionButton(
+    ExtendedFloatingActionButton(
+        icon = {
+            Icon(
+                painter = painterResource(id = R.drawable.compare_arrow_24),
+                contentDescription = stringResource(id = R.string.currency_conversion)
+            )
+        },
+        text = { Text("Convert") },
         onClick = { onClick() }
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.compare_arrow), contentDescription = stringResource
-                (id = R.string.currency_conversion)
-        )
-    }
+    )
 }
 
 @Preview(showBackground = true)

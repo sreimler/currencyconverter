@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 
+private const val PRIVACY_POLICY_URL = "https://www.iubenda.com/privacy-policy/68707157"
+
 @Composable
 fun InfoScreen(modifier: Modifier = Modifier) {
     Surface(modifier = modifier) {
@@ -22,7 +24,7 @@ fun InfoScreen(modifier: Modifier = Modifier) {
                 }
             },
             update = { webView ->
-                webView.loadUrl("https://www.iubenda.com/privacy-policy/68707157")
+                webView.loadUrl(PRIVACY_POLICY_URL)
             }
         )
     }
