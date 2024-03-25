@@ -9,9 +9,17 @@ plugins {
 // Version information
 val versionMajor = 0
 val versionMinor = 2
-val versionPatch = 0
+val versionPatch = 1
 
 android {
+    signingConfigs {
+        create("release") {
+            storeFile = file(providers.gradleProperty("storeFile").get())
+            storePassword = providers.gradleProperty("storePassword").get()
+            keyAlias = providers.gradleProperty("keyAlias").get()
+            keyPassword = providers.gradleProperty("keyPassword").get()
+        }
+    }
     namespace = "com.sreimler.currencyconverter"
     compileSdk = 34
 
@@ -36,8 +44,9 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
         }
         all {
             android.buildFeatures.buildConfig = true
