@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sreimler.currencyconverter.data.CURRENCY_EUR
+import com.sreimler.currencyconverter.data.CURRENCY_USD
 import com.sreimler.currencyconverter.data.model.Currency
 import com.sreimler.currencyconverter.data.model.ExchangeRate
 import com.sreimler.currencyconverter.data.repository.LocalCurrencyRepository
@@ -17,8 +18,8 @@ import java.io.IOException
 sealed interface CurrencyUiState {
     data class Success(
         val exchangeRates: List<ExchangeRate>,
-        val sourceCurrency: Currency,
-        val targetCurrency: Currency,
+        val sourceCurrency: Currency = CURRENCY_USD,
+        val targetCurrency: Currency = CURRENCY_USD,
         val sourceAmount: Double = 0.0,
         val targetAmount: Double = 0.0
     ) : CurrencyUiState

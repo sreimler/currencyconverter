@@ -126,8 +126,10 @@ fun CurrencyConverterTopBar(
         },
         actions = {
             // RowScope here, so these icons will be placed horizontally
-            IconButton(onClick = openInfo) {
-                Icon(Icons.Filled.Info, contentDescription = null)
+            if (currentScreen != Screen.Info) {
+                IconButton(onClick = openInfo) {
+                    Icon(Icons.Filled.Info, contentDescription = null)
+                }
             }
         }
     )
