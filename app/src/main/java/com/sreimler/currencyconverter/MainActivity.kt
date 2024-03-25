@@ -87,7 +87,8 @@ fun CurrencyConversionApp() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
-                .padding(horizontal = 8.dp)
+                .padding(horizontal = 16.dp)
+                .padding(top = 24.dp)
         ) {
             composable(route = Screen.List.name) {
                 val uiState = viewModel.currencyUiState.collectAsState()

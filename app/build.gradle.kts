@@ -9,7 +9,7 @@ plugins {
 // Version information
 val versionMajor = 0
 val versionMinor = 2
-val versionPatch = 1
+val versionPatch = 2
 
 android {
     signingConfigs {
@@ -25,7 +25,7 @@ android {
 
     defaultConfig {
         applicationId = "com.sreimler.currencyconverter"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
         versionName = "${versionMajor}.${versionMinor}.${versionPatch}"

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sreimler.currencyconverter.data.CURRENCY_EUR
 import com.sreimler.currencyconverter.data.CURRENCY_USD
+import com.sreimler.currencyconverter.data.REFRESH_DATETIME
 import com.sreimler.currencyconverter.data.model.Currency
 import com.sreimler.currencyconverter.data.model.ExchangeRate
 import com.sreimler.currencyconverter.data.repository.LocalCurrencyRepository
@@ -14,15 +15,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.time.LocalDateTime
 
+// TODO: check if this is best practice for handling ui state data and loading state
 sealed interface CurrencyUiState {
     data class Success(
         val exchangeRates: List<ExchangeRate>,
+        val refreshDate: LocalDateTime = LocalDateTime.now(),
         val sourceCurrency: Currency = CURRENCY_USD,
         val targetCurrency: Currency = CURRENCY_USD,
         val sourceAmount: Double = 0.0,
         val targetAmount: Double = 0.0
     ) : CurrencyUiState
+
     data object Loading : CurrencyUiState
     data object Error : CurrencyUiState
 }
@@ -30,7 +35,6 @@ sealed interface CurrencyUiState {
 class CurrencyConverterViewModel : ViewModel() {
     private val currencyRepository = LocalCurrencyRepository()
     //private val currencyRepository = NetworkCurrencyRepository()
-
     private val _currencyUiState = MutableStateFlow<CurrencyUiState>(CurrencyUiState.Loading)
     val currencyUiState: StateFlow<CurrencyUiState> = _currencyUiState.asStateFlow()
 
@@ -58,6 +62,7 @@ class CurrencyConverterViewModel : ViewModel() {
                 val rates = currencyRepository.getExchangeRates(baseCurrency = baseCurrency)
                 _currencyUiState.value = CurrencyUiState.Success(
                     exchangeRates = rates,
+                    refreshDate = REFRESH_DATETIME, // insert actual refresh date
                     sourceCurrency = baseCurrency,
                     targetCurrency = CURRENCY_EUR
                 )

@@ -2,6 +2,7 @@ package com.sreimler.currencyconverter.data
 
 import com.sreimler.currencyconverter.data.model.Currency
 import com.sreimler.currencyconverter.data.model.ExchangeRate
+import java.time.LocalDateTime
 
 val CURRENCY_EUR = Currency(
     symbol = "€",
@@ -59,3 +60,5 @@ val EXCHANGE_RATE_LIST = listOf(
     ExchangeRate(currency = CURRENCY_USD, baseCurrency = CURRENCY_USD, rate = 1.0),
     ExchangeRate(currency = CURRENCY_JPY, baseCurrency = CURRENCY_USD, rate = 150.7430869771)
 )
+
+val REFRESH_DATETIME: LocalDateTime = LocalDateTime.parse("2024-03-22T21:00:00")
