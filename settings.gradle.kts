@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -19,7 +20,8 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Currency Converter"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+rootProject.name = "CurrencyConverter"
 include(":app")
 include(":converter:domain")
 include(":converter:data")
@@ -28,4 +30,7 @@ include(":list:domain")
 include(":list:data")
 include(":list:presentation")
 include(":core:database")
-include(":build-logic:convention")
+include(":core:data")
+include(":core:domain")
+include(":core:presentation")
+include(":core:network")

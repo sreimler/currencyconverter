@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.sreimler.currencyconverter.core.database"
+    namespace = "com.sreimler.currencyconverter.core.data"
     compileSdk = 34
 
     defaultConfig {
@@ -31,6 +31,8 @@ android {
 
 dependencies {
     implementation(projects.core.domain)
+    implementation(projects.core.database)
+    implementation(projects.core.network)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

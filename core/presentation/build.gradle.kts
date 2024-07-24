@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.sreimler.currencyconverter.core.database"
+    namespace = "com.sreimler.currencyconverter.core.presentation"
     compileSdk = 34
 
     defaultConfig {

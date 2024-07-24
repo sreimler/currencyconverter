@@ -1,9 +1,13 @@
 plugins {
-    id("java-library")
-    alias(libs.plugins.jetbrainsKotlinJvm)
+    `kotlin-dsl`
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+group = "com.sreimler.currencyconverter.buildlogic"
+
+dependencies {
+    compileOnly(libs.android.gradle.plugin)
+    compileOnly(libs.android.tools.common)
+    compileOnly(libs.kotlin.gradle.plugin)
+    compileOnly(libs.ksp.gradle.plugin)
+    compileOnly(libs.room.gradle.plugin)
 }
