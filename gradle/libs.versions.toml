@@ -24,6 +24,11 @@ coroutines = "1.8.0"
 desugarJdkLibs = "2.0.4"
 composeCompiler = "1.5.14"
 
+# Project versions
+projectMinSdkVersion = "25"
+projectTargetSdkVersion = "34"
+projectCompileSdkVersion = "34"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
@@ -63,3 +68,4 @@ jetbrainsKotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.seriali
 jetbrainsKotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 currencyconverter-android-application = { id = "com.sreimler.currencyconverter.android.application", version = "unspecified" }
+currencyconverter-android-library = { id = "com.sreimler.currencyconverter.android.library", version = "unspecified" }

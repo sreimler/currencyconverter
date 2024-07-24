@@ -18,5 +18,9 @@ gradlePlugin {
             id = "com.sreimler.currencyconverter.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
+        register("androidLibrary") {
+            id = "com.sreimler.currencyconverter.android.library"
+            implementationClass = "AndroidLibraryConventionPlugin"
+        }
     }
 }

@@ -3,6 +3,7 @@ import com.sreimler.currencyconverter.convention.ExtensionType
 import com.sreimler.currencyconverter.convention.configureAndroidCompose
 import com.sreimler.currencyconverter.convention.configureBuildTypes
 import com.sreimler.currencyconverter.convention.configureKotlinAndroid
+import com.sreimler.currencyconverter.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -20,6 +21,10 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             // Equivalent to android block in build.gradle
             extensions.configure<ApplicationExtension> {
+                defaultConfig {
+                    targetSdk = libs.findVersion("projectTargetSdkVersion").get().toString().toInt()
+                }
+
                 configureKotlinAndroid(this)
                 configureBuildTypes(this, ExtensionType.APPLICATION)
             }

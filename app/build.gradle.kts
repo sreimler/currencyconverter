@@ -17,12 +17,9 @@ android {
         }
     }
     namespace = "com.sreimler.currencyconverter"
-    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.sreimler.currencyconverter"
-        minSdk = 26
-        targetSdk = 34
         versionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
         versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
 
