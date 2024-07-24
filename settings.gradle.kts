@@ -20,6 +20,9 @@ dependencyResolutionManagement {
     }
 }
 
+// Temporary fix for "Unable to make progress running work" issue: https://issuetracker.google.com/issues/315023802
+gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:convention:testClasses"))
+
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 rootProject.name = "CurrencyConverter"
 include(":app")

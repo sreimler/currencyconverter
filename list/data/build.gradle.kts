@@ -10,8 +10,4 @@ dependencies {
     implementation(projects.list.domain)
     implementation(projects.core.domain)
     implementation(projects.core.data)
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 }

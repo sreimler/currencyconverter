@@ -2,6 +2,7 @@ import com.android.build.api.dsl.LibraryExtension
 import com.sreimler.currencyconverter.convention.ExtensionType
 import com.sreimler.currencyconverter.convention.configureBuildTypes
 import com.sreimler.currencyconverter.convention.configureKotlinAndroid
+import com.sreimler.currencyconverter.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -30,6 +31,10 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             dependencies {
                 "testImplementation"(kotlin("test"))
+                "testImplementation"(project.libs.findLibrary("junit").get())
+                "androidTestImplementation"(project.libs.findLibrary("junit").get())
+                "androidTestImplementation"(project.libs.findLibrary("androidx-junit").get())
+                "androidTestImplementation"(project.libs.findLibrary("androidx-espresso-core").get())
             }
         }
     }
