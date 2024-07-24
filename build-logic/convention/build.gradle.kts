@@ -11,3 +11,12 @@ dependencies {
     compileOnly(libs.ksp.gradle.plugin)
     compileOnly(libs.room.gradle.plugin)
 }
+
+gradlePlugin {
+    plugins {
+        register("androidApplication") {
+            id = "com.sreimler.currencyconverter.android.application"
+            implementationClass = "AndroidApplicationConventionPlugin"
+        }
+    }
+}

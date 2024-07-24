@@ -1,6 +1,6 @@
 [versions]
-agp = "8.3.0"
-kotlin = "1.9.0"
+agp = "8.5.1"
+kotlin = "1.9.24"
 coreKtx = "1.12.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -21,6 +21,8 @@ room = "2.6.1"
 ksp = "1.9.22-1.0.17"
 androidTools = "31.2.2"
 coroutines = "1.8.0"
+desugarJdkLibs = "2.0.4"
+composeCompiler = "1.5.14"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,6 +47,7 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2KotlinxSerializationConverter" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }
 
 # Gradle
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -59,4 +62,4 @@ jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "k
 jetbrainsKotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerialization" }
 jetbrainsKotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
-
+currencyconverter-android-application = { id = "com.sreimler.currencyconverter.android.application", version = "unspecified" }
