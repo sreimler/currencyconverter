@@ -19,7 +19,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -27,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -35,7 +33,6 @@ import androidx.navigation.compose.rememberNavController
 import com.sreimler.currencyconverter.converter.presentation.ConverterScreen
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
 import com.sreimler.currencyconverter.list.presentation.ListScreen
-import com.sreimler.currencyconverter.viewmodel.CurrencyListViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,17 +48,16 @@ class MainActivity : ComponentActivity() {
 }
 
 enum class Screen(@StringRes val title: Int) {
-    List(title = R.string.currency_list),
-    Converter(title = R.string.app_name),
-    Info(title = R.string.info)
+    LIST(title = R.string.currency_list),
+    CONVERTER(title = R.string.app_name),
+    INFO(title = R.string.info)
 }
 
 @Composable
 fun CurrencyConversionApp() {
-    val viewModel: CurrencyListViewModel = viewModel()
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = Screen.valueOf(backStackEntry?.destination?.route ?: Screen.List.name)
+    val currentScreen = Screen.valueOf(backStackEntry?.destination?.route ?: Screen.LIST.name)
 
     Scaffold(
         topBar = {
@@ -69,37 +65,33 @@ fun CurrencyConversionApp() {
                 currentScreen = currentScreen,
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() },
-                openInfo = { navController.navigate(Screen.Info.name) }
+                openInfo = { navController.navigate(Screen.INFO.name) }
             )
         },
         floatingActionButton = {
-            if (currentScreen.name == Screen.List.name) {
+            if (currentScreen.name == Screen.LIST.name) {
                 ConverterFab(onClick = {
-                    navController.navigate(Screen.Converter.name)
+                    navController.navigate(Screen.CONVERTER.name)
                 })
             }
         }
     ) {
         NavHost(
             navController = navController,
-            startDestination = Screen.List.name,
+            startDestination = Screen.LIST.name,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
                 .padding(horizontal = 16.dp)
                 .padding(top = 24.dp)
         ) {
-            composable(route = Screen.List.name) {
-                val uiState = viewModel.currencyUiState.collectAsState()
-                ListScreen(uiState = uiState.value)
+            composable(route = Screen.LIST.name) {
+                ListScreen()
             }
-            composable(route = Screen.Converter.name) {
-                val uiState = viewModel.currencyUiState.collectAsState()
-                ConverterScreen(
-                    uiState = uiState.value,
-                    onChange = { amount, currency -> viewModel.amountChanged(amount, currency) })
+            composable(route = Screen.CONVERTER.name) {
+                ConverterScreen()
             }
-            composable(route = Screen.Info.name) {
+            composable(route = Screen.INFO.name) {
                 InfoScreen()
             }
         }
@@ -109,8 +101,10 @@ fun CurrencyConversionApp() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrencyConverterTopBar(
-    currentScreen: Screen, canNavigateBack: Boolean, navigateUp: () -> Unit, openInfo: () ->
-    Unit
+    currentScreen: Screen,
+    canNavigateBack: Boolean,
+    navigateUp: () -> Unit,
+    openInfo: () -> Unit
 ) {
     CenterAlignedTopAppBar(
         title = { Text(text = stringResource(currentScreen.title), fontWeight = FontWeight.Bold) },
@@ -126,7 +120,7 @@ fun CurrencyConverterTopBar(
         },
         actions = {
             // RowScope here, so these icons will be placed horizontally
-            if (currentScreen != Screen.Info) {
+            if (currentScreen != Screen.INFO) {
                 IconButton(onClick = openInfo) {
                     Icon(Icons.Filled.Info, contentDescription = null)
                 }
@@ -151,7 +145,7 @@ fun ConverterFab(onClick: () -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun AppPreview() {
     CurrencyConverterTheme {
         CurrencyConversionApp()
     }

@@ -61,11 +61,11 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
 
-    // Retrofit
-    //implementation(libs.retrofit2.kotlinx.serialization.converter)
-    //implementation(libs.retrofit)
-    //implementation(libs.okhttp)
-    //implementation(libs.kotlinx.serialization.json)
+    // Koin DI
+    implementation(libs.bundles.koin)
+
+    // Timber logging
+    implementation(libs.timber)
 
     testImplementation(libs.junit)
 

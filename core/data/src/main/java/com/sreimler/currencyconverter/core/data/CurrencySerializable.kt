@@ -5,12 +5,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GetCurrenciesResponse(
-    val data: Map<String, Currency>
+    val data: Map<String, CurrencySerializable>
 )
 
 
 @Serializable
-data class Currency(
+data class CurrencySerializable(
     val symbol: String,
     val name: String,
     @SerialName(value = "symbol_native") val symbolNative: String,
