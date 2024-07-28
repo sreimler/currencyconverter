@@ -32,11 +32,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.sreimler.currencyconverter.ui.screens.ConverterScreen
-import com.sreimler.currencyconverter.ui.screens.InfoScreen
-import com.sreimler.currencyconverter.ui.screens.ListScreen
-import com.sreimler.currencyconverter.ui.theme.CurrencyConverterTheme
-import com.sreimler.currencyconverter.viewmodel.CurrencyConverterViewModel
+import com.sreimler.currencyconverter.converter.presentation.ConverterScreen
+import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
+import com.sreimler.currencyconverter.list.presentation.ListScreen
+import com.sreimler.currencyconverter.viewmodel.CurrencyListViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +58,7 @@ enum class Screen(@StringRes val title: Int) {
 
 @Composable
 fun CurrencyConversionApp() {
-    val viewModel: CurrencyConverterViewModel = viewModel()
+    val viewModel: CurrencyListViewModel = viewModel()
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = Screen.valueOf(backStackEntry?.destination?.route ?: Screen.List.name)

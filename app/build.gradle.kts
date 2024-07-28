@@ -40,8 +40,6 @@ dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.data)
     implementation(projects.core.presentation)
-    implementation(projects.core.database)
-    implementation(projects.core.network)
 
     implementation(projects.list.domain)
     implementation(projects.list.data)
@@ -51,7 +49,10 @@ dependencies {
     implementation(projects.converter.data)
     implementation(projects.converter.presentation)
 
+    // Core
     implementation(libs.androidx.core.ktx)
+
+    // Compose
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.ui)
@@ -61,10 +62,10 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     // Retrofit
-    implementation(libs.retrofit2.kotlinx.serialization.converter)
-    implementation(libs.retrofit)
-    implementation(libs.okhttp)
-    implementation(libs.kotlinx.serialization.json)
+    //implementation(libs.retrofit2.kotlinx.serialization.converter)
+    //implementation(libs.retrofit)
+    //implementation(libs.okhttp)
+    //implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
 
