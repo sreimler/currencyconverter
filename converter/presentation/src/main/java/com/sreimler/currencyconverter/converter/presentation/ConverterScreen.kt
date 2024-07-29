@@ -1,42 +1,48 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.sreimler.currencyconverter.converter.presentation
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text2.BasicTextField2
+import androidx.compose.foundation.text2.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.sreimler.currencyconverter.data.CURRENCY_EUR
-import com.sreimler.currencyconverter.data.CURRENCY_USD
-import com.sreimler.currencyconverter.data.EXCHANGE_RATE_LIST
-import com.sreimler.currencyconverter.data.model.Currency
-import com.sreimler.currencyconverter.viewmodel.CurrencyUiState
+import com.sreimler.currencyconverter.core.domain.Currency
+import org.koin.androidx.compose.koinViewModel
 import java.text.DecimalFormat
 
 private val df = DecimalFormat("#,##0.00")
 
 @Composable
-fun ConverterScreen(modifier: Modifier = Modifier, uiState: CurrencyUiState, onChange: (String, Currency) -> Unit) {
+fun ConverterScreenRoot(modifier: Modifier = Modifier, viewModel: ConverterViewModel = koinViewModel()) {
+    ConverterScreen(state = viewModel.state)
+}
+
+@Composable
+fun ConverterScreen(modifier: Modifier = Modifier, state: ConverterState) {
     Surface(modifier = modifier) {
-        if (uiState is CurrencyUiState.Success) {
+        if (state.sourceCurrency != null && state.targetCurrency != null) {
             Column {
-                CurrencyRow(currency = uiState.sourceCurrency, amount = uiState.sourceAmount, onChange = onChange)
-                CurrencyRow(currency = uiState.targetCurrency, amount = uiState.targetAmount, onChange = onChange)
+                CurrencyRow(currency = state.sourceCurrency, textFieldState = state.sourceAmount)
+                CurrencyRow(currency = state.targetCurrency, textFieldState = state.targetAmount)
             }
         }
     }
 }
 
 @Composable
-fun CurrencyRow(currency: Currency, amount: Double, onChange: (String, Currency) -> Unit) {
+fun CurrencyRow(currency: Currency, textFieldState: TextFieldState) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = currency.name,
@@ -64,9 +70,10 @@ fun CurrencyRow(currency: Currency, amount: Double, onChange: (String, Currency)
         //    )
         //}
 
-        TextField(
-            value = df.format(amount),
-            onValueChange = { onChange(it, currency) },
+        BasicTextField2(
+            //value = df.format(amount),
+            //onValueChange = { viewModel.(it, currency) },
+            state = textFieldState,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal
             ),
@@ -75,7 +82,7 @@ fun CurrencyRow(currency: Currency, amount: Double, onChange: (String, Currency)
                 .weight(1f),
             //interactionSource = interactionSource,
             textStyle = MaterialTheme.typography.headlineLarge.copy(textAlign = TextAlign.End),
-            label = { Text(currency.code) }
+            //label = { Text(currency.code) }
         )
 
     }
@@ -84,14 +91,5 @@ fun CurrencyRow(currency: Currency, amount: Double, onChange: (String, Currency)
 @Preview
 @Composable
 fun ConverterScreenPreview() {
-    ConverterScreen(
-        uiState = CurrencyUiState.Success(
-            exchangeRates = EXCHANGE_RATE_LIST,
-            sourceCurrency = CURRENCY_USD,
-            targetCurrency = CURRENCY_EUR,
-            sourceAmount = 5.00,
-            targetAmount = 6.33
-        ),
-        onChange = { _, _ -> }
-    )
+    ConverterScreen(state = ConverterState()) // TODO: emulate currencies
 }
