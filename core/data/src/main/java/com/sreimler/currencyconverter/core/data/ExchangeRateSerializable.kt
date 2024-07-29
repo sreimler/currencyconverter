@@ -8,8 +8,8 @@ data class GetExchangeRateResponse(
 )
 
 @Serializable
-data class ExchangeRate(
-    val currency: Currency,
-    val baseCurrency: Currency,
+data class ExchangeRateSerializable(
+    val currency: CurrencySerializable,
+    val baseCurrency: CurrencySerializable,
     val rate: Double
 )

@@ -2,22 +2,20 @@ package com.sreimler.currencyconverter.core.data.networking
 
 import android.util.Log
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import com.sreimler.currencyconverter.BuildConfig
-import com.sreimler.currencyconverter.core.data.Currency
-import com.sreimler.currencyconverter.core.data.ExchangeRate
-import com.sreimler.currencyconverter.data.CURRENCIES_LIST
-import com.sreimler.currencyconverter.data.CURRENCY_USD
-import com.sreimler.currencyconverter.data.EXCHANGE_RATE_LIST
+import com.sreimler.currencyconverter.core.data.BuildConfig
+import com.sreimler.currencyconverter.core.data.CurrencySerializable
+import com.sreimler.currencyconverter.core.data.ExchangeRateSerializable
+import com.sreimler.currencyconverter.core.data.toCurrency
+import com.sreimler.currencyconverter.core.data.toCurrencySerializable
+import com.sreimler.currencyconverter.core.data.toExchangeRate
+import com.sreimler.currencyconverter.core.domain.CURRENCIES_LIST
+import com.sreimler.currencyconverter.core.domain.CURRENCY_USD
+import com.sreimler.currencyconverter.core.domain.Currency
+import com.sreimler.currencyconverter.core.domain.CurrencyRepository
+import com.sreimler.currencyconverter.core.domain.ExchangeRate
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-
-interface CurrencyRepository {
-    suspend fun getCurrencies(): List<Currency>
-    suspend fun getExchangeRates(baseCurrency: Currency): List<ExchangeRate>
-    fun getBaseCurrency(): Currency
-    fun setBaseCurrency(currency: Currency)
-}
 
 class NetworkCurrencyRepository : CurrencyRepository {
     private val baseUrl = "https://api.freecurrencyapi.com/v1/"
@@ -34,12 +32,12 @@ class NetworkCurrencyRepository : CurrencyRepository {
     override suspend fun getCurrencies(): List<Currency> {
         val response = retrofitService.getCurrencyList(BuildConfig.API_KEY_FREECURRENCY)
         Log.i(NetworkCurrencyRepository::class.java.name, "response: ${response.body()}")
-        val currencies: MutableList<Currency> = mutableListOf()
+        val currencies: MutableList<CurrencySerializable> = mutableListOf()
         response.body()?.data?.forEach {
             currencies.add(it.value)
         }
         Log.i(NetworkCurrencyRepository::class.java.name, "currencies: $currencies")
-        return currencies
+        return currencies.map { it.toCurrency() }
     }
 
     override suspend fun getExchangeRates(baseCurrency: Currency): List<ExchangeRate> {
@@ -53,37 +51,25 @@ class NetworkCurrencyRepository : CurrencyRepository {
             currencies = currencies
         )
 
-        val exchangeRates: MutableList<ExchangeRate> = mutableListOf()
+        val exchangeRates: MutableList<ExchangeRateSerializable> = mutableListOf()
 
         response.body()?.data?.forEach { (code, rate) ->
             CURRENCIES_LIST.find { currency -> currency.code == code }?.let {
-                exchangeRates.add(ExchangeRate(currency = it, baseCurrency = baseCurrency, rate = rate))
+                exchangeRates.add(
+                    ExchangeRateSerializable(
+                        currency = it.toCurrencySerializable(),
+                        baseCurrency = baseCurrency.toCurrencySerializable(),
+                        rate = rate
+                    )
+                )
             }
         }
 
-        return exchangeRates
+        return exchangeRates.map { it.toExchangeRate() }
     }
 
     override fun getBaseCurrency(): Currency {
         // TODO: implement
-        return CURRENCY_USD
-    }
-
-    override fun setBaseCurrency(currency: Currency) {
-        // TODO: implement
-    }
-}
-
-class LocalCurrencyRepository : CurrencyRepository {
-    override suspend fun getCurrencies(): List<Currency> {
-        return CURRENCIES_LIST
-    }
-
-    override suspend fun getExchangeRates(baseCurrency: Currency): List<ExchangeRate> {
-        return EXCHANGE_RATE_LIST
-    }
-
-    override fun getBaseCurrency(): Currency {
         return CURRENCY_USD
     }
 

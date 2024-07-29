@@ -1,4 +1,4 @@
-package com.sreimler.currencyconverter.core.data
+package com.sreimler.currencyconverter.core.domain
 
 import java.time.LocalDateTime
 

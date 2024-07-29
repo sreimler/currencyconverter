@@ -3,40 +3,23 @@ package com.sreimler.currencyconverter.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sreimler.currencyconverter.data.CURRENCY_EUR
-import com.sreimler.currencyconverter.data.CURRENCY_USD
-import com.sreimler.currencyconverter.data.REFRESH_DATETIME
-import com.sreimler.currencyconverter.data.model.Currency
-import com.sreimler.currencyconverter.data.model.ExchangeRate
-import com.sreimler.currencyconverter.data.repository.LocalCurrencyRepository
+import com.sreimler.currencyconverter.core.domain.CURRENCY_EUR
+import com.sreimler.currencyconverter.core.domain.Currency
+import com.sreimler.currencyconverter.core.domain.CurrencyRepository
+import com.sreimler.currencyconverter.core.domain.REFRESH_DATETIME
+import com.sreimler.currencyconverter.list.presentation.CurrencyListState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.time.LocalDateTime
 
-// TODO: check if this is best practice for handling ui state data and loading state
-sealed interface CurrencyUiState {
-    data class Success(
-        val exchangeRates: List<ExchangeRate>,
-        val refreshDate: LocalDateTime = LocalDateTime.now(),
-        val sourceCurrency: Currency = CURRENCY_USD,
-        val targetCurrency: Currency = CURRENCY_USD,
-        val sourceAmount: Double = 0.0,
-        val targetAmount: Double = 0.0
-    ) : CurrencyUiState
 
-    data object Loading : CurrencyUiState
-    data object Error : CurrencyUiState
-}
+class CurrencyListViewModel(private val currencyRepository: CurrencyRepository) : ViewModel() {
 
-class CurrencyListViewModel : ViewModel() {
-    private val currencyRepository = LocalCurrencyRepository()
-    //private val currencyRepository = NetworkCurrencyRepository()
-    private val _currencyUiState = MutableStateFlow<CurrencyUiState>(CurrencyUiState.Loading)
-    val currencyUiState: StateFlow<CurrencyUiState> = _currencyUiState.asStateFlow()
+    private val _state = MutableStateFlow<CurrencyListState>(CurrencyListState.Loading)
+    val state: StateFlow<CurrencyListState> = _state.asStateFlow()
 
     init {
         getExchangeRates()
@@ -60,7 +43,7 @@ class CurrencyListViewModel : ViewModel() {
             try {
                 val baseCurrency = currencyRepository.getBaseCurrency()
                 val rates = currencyRepository.getExchangeRates(baseCurrency = baseCurrency)
-                _currencyUiState.value = CurrencyUiState.Success(
+                _state.value = CurrencyListState.Success(
                     exchangeRates = rates,
                     refreshDate = REFRESH_DATETIME, // insert actual refresh date
                     sourceCurrency = baseCurrency,
@@ -86,18 +69,18 @@ class CurrencyListViewModel : ViewModel() {
                     amountCurrency.name
         )
         try {
-            val uiState = _currencyUiState.value as CurrencyUiState.Success
+            val newState = _state.value as CurrencyListState.Success
 
             val userInput = changedAmount.trim().toDouble()
-            val sourceRate = uiState.exchangeRates.find { it.currency == uiState.sourceCurrency }!!
-            val targetRate = uiState.exchangeRates.find { it.currency == uiState.targetCurrency }!!
+            val sourceRate = newState.exchangeRates.find { it.currency == newState.sourceCurrency }!!
+            val targetRate = newState.exchangeRates.find { it.currency == newState.targetCurrency }!!
 
-            if (amountCurrency == uiState.sourceCurrency) {
+            if (amountCurrency == newState.sourceCurrency) {
                 // Calculate target currency
                 val convertedAmount = (userInput * targetRate.rate) / sourceRate.rate
 
-                _currencyUiState.update {
-                    uiState.copy(
+                _state.update {
+                    newState.copy(
                         sourceAmount = userInput,
                         targetAmount = convertedAmount
                     )
@@ -106,8 +89,8 @@ class CurrencyListViewModel : ViewModel() {
                 // Calculate source currency
                 val convertedAmount = (userInput * sourceRate.rate) / targetRate.rate
 
-                _currencyUiState.update {
-                    uiState.copy(
+                _state.update {
+                    newState.copy(
                         sourceAmount = convertedAmount,
                         targetAmount = userInput
                     )

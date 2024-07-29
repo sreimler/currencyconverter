@@ -10,16 +10,18 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sreimler.currencyconverter.data.EXCHANGE_RATE_LIST
-import com.sreimler.currencyconverter.data.model.Currency
-import com.sreimler.currencyconverter.data.model.ExchangeRate
-import com.sreimler.currencyconverter.ui.theme.CurrencyConverterTheme
-import com.sreimler.currencyconverter.viewmodel.CurrencyUiState
+import com.sreimler.currencyconverter.core.domain.Currency
+import com.sreimler.currencyconverter.core.domain.ExchangeRate
+import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
+import com.sreimler.currencyconverter.viewmodel.CurrencyListViewModel
+import org.koin.androidx.compose.koinViewModel
 import java.text.DecimalFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -29,14 +31,22 @@ private val decimalFormat = DecimalFormat("#,##0.0000")
 private val dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
 
 @Composable
-fun ListScreen(modifier: Modifier = Modifier, uiState: CurrencyUiState) {
+fun CurrencyListScreenRoot(modifier: Modifier = Modifier, viewModel: CurrencyListViewModel = koinViewModel()) {
+    CurrencyListScreen(state = viewModel.state.collectAsState())
+}
+
+@Composable
+fun CurrencyListScreen(modifier: Modifier = Modifier, state: State<CurrencyListState>) {
     Surface(modifier = modifier) {
-        when (uiState) {
-            is CurrencyUiState.Loading -> {}
-            is CurrencyUiState.Error -> {}
-            is CurrencyUiState.Success -> CurrencyList(
-                uiState.exchangeRates, uiState.sourceCurrency, uiState
-                    .refreshDate
+        val currenctState = state.value
+
+        when (currenctState) {
+            is CurrencyListState.Loading -> {}
+            is CurrencyListState.Error -> {}
+            is CurrencyListState.Success -> CurrencyList(
+                currenctState.exchangeRates,
+                currenctState.sourceCurrency,
+                currenctState.refreshDate
             )
         }
     }
@@ -76,10 +86,6 @@ fun CurrencyCard(currency: Currency, rate: Double) {
 @Composable
 fun ListScreenPreview() {
     CurrencyConverterTheme {
-        ListScreen(
-            uiState = CurrencyUiState.Success(
-                exchangeRates = EXCHANGE_RATE_LIST
-            )
-        )
+        CurrencyListScreenRoot()
     }
 }

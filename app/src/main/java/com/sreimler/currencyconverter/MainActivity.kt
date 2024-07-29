@@ -32,7 +32,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sreimler.currencyconverter.converter.presentation.ConverterScreen
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
-import com.sreimler.currencyconverter.list.presentation.ListScreen
+import com.sreimler.currencyconverter.list.presentation.CurrencyListScreenRoot
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,7 +86,7 @@ fun CurrencyConversionApp() {
                 .padding(top = 24.dp)
         ) {
             composable(route = Screen.LIST.name) {
-                ListScreen()
+                CurrencyListScreenRoot()
             }
             composable(route = Screen.CONVERTER.name) {
                 ConverterScreen()
