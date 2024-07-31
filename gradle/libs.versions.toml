@@ -1,13 +1,13 @@
 [versions]
 agp = "8.5.1"
-kotlin = "1.9.24"
-coreKtx = "1.12.0"
+kotlin = "2.0.0"
+coreKtx = "1.13.1"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-lifecycleRuntimeKtx = "2.7.0"
-activityCompose = "1.8.2"
-composeBom = "2024.02.02"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+lifecycleRuntimeKtx = "2.8.4"
+activityCompose = "1.9.1"
+composeBom = "2024.06.00"
 navigationCompose = "2.7.7"
 okhttp = "4.12.0"
 retrofit = "2.10.0"
@@ -18,8 +18,8 @@ jetbrainsKotlinJvm = "1.9.0"
 appcompat = "1.7.0"
 material = "1.12.0"
 room = "2.6.1"
-ksp = "1.9.22-1.0.17"
-androidTools = "31.2.2"
+ksp = "2.0.0-1.0.23"
+androidTools = "31.5.1"
 coroutines = "1.8.0"
 desugarJdkLibs = "2.0.4"
 composeCompiler = "1.5.14"
@@ -34,6 +34,9 @@ projectCompileSdkVersion = "34"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -76,6 +79,9 @@ jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "k
 jetbrainsKotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerialization" }
 jetbrainsKotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 currencyconverter-android-application = { id = "com.sreimler.currencyconverter.android.application", version = "unspecified" }
 currencyconverter-android-library = { id = "com.sreimler.currencyconverter.android.library", version = "unspecified" }
 currencyconverter-android-library-compose = { id = "com.sreimler.currencyconverter.android.library.compose", version = "unspecified" }

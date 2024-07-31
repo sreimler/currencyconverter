@@ -10,10 +10,6 @@ internal fun Project.configureAndroidCompose(commonExtension: CommonExtension<*,
             compose = true
         }
 
-        composeOptions {
-            kotlinCompilerExtensionVersion = libs.findVersion("composeCompiler").get().toString()
-        }
-
         dependencies {
             val bom = libs.findLibrary("androidx-compose-bom").get()
             "implementation"(platform(bom))
