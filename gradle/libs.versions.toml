@@ -86,6 +86,7 @@ currencyconverter-android-application = { id = "com.sreimler.currencyconverter.a
 currencyconverter-android-library = { id = "com.sreimler.currencyconverter.android.library", version = "unspecified" }
 currencyconverter-android-library-compose = { id = "com.sreimler.currencyconverter.android.library.compose", version = "unspecified" }
 currencyconverter-jvm-library = { id = "com.sreimler.currencyconverter.jvm.library", version = "unspecified" }
+currencyconverter-android-room = { id = "com.sreimler.currencyconverter.android.room", version = "unspecified" }
 
 [bundles]
 compose = [

@@ -1,4 +1,4 @@
-package com.sreimler.currencyconverter.core.data
+package com.sreimler.currencyconverter.core.database
 
 import com.sreimler.currencyconverter.core.domain.CURRENCIES_LIST
 import com.sreimler.currencyconverter.core.domain.CURRENCY_USD

@@ -1,6 +1,7 @@
 package com.sreimler.currencyconverter.core.domain
 
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 val CURRENCY_EUR = Currency(
     symbol = "€",
@@ -53,10 +54,30 @@ val CURRENCIES_LIST = listOf(
 )
 
 val EXCHANGE_RATE_LIST = listOf(
-    ExchangeRate(currency = CURRENCY_CAD, baseCurrency = CURRENCY_USD, rate = 1.3470202542),
-    ExchangeRate(currency = CURRENCY_EUR, baseCurrency = CURRENCY_USD, rate = 0.9142101729),
-    ExchangeRate(currency = CURRENCY_USD, baseCurrency = CURRENCY_USD, rate = 1.0),
-    ExchangeRate(currency = CURRENCY_JPY, baseCurrency = CURRENCY_USD, rate = 150.7430869771)
+    ExchangeRate(
+        targetCurrency = CURRENCY_CAD,
+        baseCurrency = CURRENCY_USD,
+        rate = 1.3470202542,
+        dateTimeUtc = ZonedDateTime.now()
+    ),
+    ExchangeRate(
+        targetCurrency = CURRENCY_EUR,
+        baseCurrency = CURRENCY_USD,
+        rate = 0.9142101729,
+        dateTimeUtc = ZonedDateTime.now()
+    ),
+    ExchangeRate(
+        targetCurrency = CURRENCY_USD,
+        baseCurrency = CURRENCY_USD,
+        rate = 1.0,
+        dateTimeUtc = ZonedDateTime.now()
+    ),
+    ExchangeRate(
+        targetCurrency = CURRENCY_JPY,
+        baseCurrency = CURRENCY_USD,
+        rate = 150.7430869771,
+        dateTimeUtc = ZonedDateTime.now()
+    )
 )
 
 val REFRESH_DATETIME: LocalDateTime = LocalDateTime.parse("2024-03-22T21:00:00")

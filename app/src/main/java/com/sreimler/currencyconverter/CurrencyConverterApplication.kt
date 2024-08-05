@@ -1,6 +1,7 @@
 package com.sreimler.currencyconverter
 
 import android.app.Application
+import com.sreimler.currencyconverter.core.database.di.databaseModule
 import com.sreimler.currencyconverter.di.appModule
 import com.sreimler.currencyconverter.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
@@ -23,7 +24,8 @@ class CurrencyConverterApplication : Application() {
             modules(
                 listOf(
                     appModule,
-                    viewModelModule
+                    viewModelModule,
+                    databaseModule
                 )
             )
         }

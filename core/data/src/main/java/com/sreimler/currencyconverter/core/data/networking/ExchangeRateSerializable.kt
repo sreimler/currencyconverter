@@ -1,4 +1,4 @@
-package com.sreimler.currencyconverter.core.data
+package com.sreimler.currencyconverter.core.data.networking
 
 import kotlinx.serialization.Serializable
 
@@ -11,5 +11,6 @@ data class GetExchangeRateResponse(
 data class ExchangeRateSerializable(
     val currency: CurrencySerializable,
     val baseCurrency: CurrencySerializable,
-    val rate: Double
+    val rate: Double,
+    val dateTimeUtc: Long
 )

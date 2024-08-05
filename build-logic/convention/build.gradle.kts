@@ -30,5 +30,9 @@ gradlePlugin {
             id = "com.sreimler.currencyconverter.jvm.library"
             implementationClass = "JvmLibraryConventionPlugin"
         }
+        register("androidRoom") {
+            id = "com.sreimler.currencyconverter.android.room"
+            implementationClass = "AndroidRoomConventionPlugin"
+        }
     }
 }

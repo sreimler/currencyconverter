@@ -40,6 +40,7 @@ dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.data)
     implementation(projects.core.presentation)
+    implementation(projects.core.database)
 
     implementation(projects.list.domain)
     implementation(projects.list.data)

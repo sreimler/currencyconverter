@@ -1,7 +1,5 @@
 package com.sreimler.currencyconverter.core.data.networking
 
-import com.sreimler.currencyconverter.core.data.GetCurrenciesResponse
-import com.sreimler.currencyconverter.core.data.GetExchangeRateResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

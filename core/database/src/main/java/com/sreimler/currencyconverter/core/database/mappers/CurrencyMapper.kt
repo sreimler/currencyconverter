@@ -1,9 +1,10 @@
-package com.sreimler.currencyconverter.core.data
+package com.sreimler.currencyconverter.core.database.mappers
 
+import com.sreimler.currencyconverter.core.database.entity.CurrencyEntity
 import com.sreimler.currencyconverter.core.domain.Currency
 
-fun Currency.toCurrencySerializable(): CurrencySerializable {
-    return CurrencySerializable(
+fun Currency.toCurrencyEntity(): CurrencyEntity {
+    return CurrencyEntity(
         symbol = symbol,
         name = name,
         symbolNative = symbolNative,
@@ -15,7 +16,7 @@ fun Currency.toCurrencySerializable(): CurrencySerializable {
     )
 }
 
-fun CurrencySerializable.toCurrency(): Currency {
+fun CurrencyEntity.toCurrency(): Currency {
     return Currency(
         symbol = symbol,
         name = name,

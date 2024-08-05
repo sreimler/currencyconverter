@@ -72,8 +72,8 @@ class CurrencyListViewModel(private val currencyRepository: CurrencyRepository) 
             val newState = _state.value as CurrencyListState.Success
 
             val userInput = changedAmount.trim().toDouble()
-            val sourceRate = newState.exchangeRates.find { it.currency == newState.sourceCurrency }!!
-            val targetRate = newState.exchangeRates.find { it.currency == newState.targetCurrency }!!
+            val sourceRate = newState.exchangeRates.find { it.targetCurrency == newState.sourceCurrency }!!
+            val targetRate = newState.exchangeRates.find { it.targetCurrency == newState.targetCurrency }!!
 
             if (amountCurrency == newState.sourceCurrency) {
                 // Calculate target currency

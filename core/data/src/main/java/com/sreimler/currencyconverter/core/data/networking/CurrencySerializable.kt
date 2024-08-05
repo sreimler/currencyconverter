@@ -1,4 +1,4 @@
-package com.sreimler.currencyconverter.core.data
+package com.sreimler.currencyconverter.core.data.networking
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -55,11 +55,11 @@ fun CurrencyListScreen(modifier: Modifier = Modifier, state: State<CurrencyListS
 @Composable
 fun CurrencyList(exchangeRates: List<ExchangeRate>, sourceCurrency: Currency, refreshDate: LocalDateTime) {
     Column {
-        val (base, list) = exchangeRates.partition { it.currency == sourceCurrency }
-        CurrencyCard(currency = base.first().currency, rate = base.first().rate)
+        val (base, list) = exchangeRates.partition { it.targetCurrency == sourceCurrency }
+        CurrencyCard(currency = base.first().targetCurrency, rate = base.first().rate)
         LazyVerticalGrid(columns = GridCells.Fixed(1)) {
-            items(items = list, key = { exchangeRate -> exchangeRate.currency.code }) { exchangeRate ->
-                CurrencyCard(currency = exchangeRate.currency, rate = exchangeRate.rate)
+            items(items = list, key = { exchangeRate -> exchangeRate.targetCurrency.code }) { exchangeRate ->
+                CurrencyCard(currency = exchangeRate.targetCurrency, rate = exchangeRate.rate)
             }
         }
         Text(
