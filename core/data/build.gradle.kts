@@ -9,6 +9,12 @@ android {
 dependencies {
     implementation(projects.core.domain)
 
+    // Koin DI
+    implementation(libs.bundles.koin)
+
+    // Preferences DataStore
+    implementation(libs.androidx.datastore)
+
     // Retrofit
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit)

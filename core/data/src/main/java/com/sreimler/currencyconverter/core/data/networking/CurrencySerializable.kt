@@ -3,12 +3,18 @@ package com.sreimler.currencyconverter.core.data.networking
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
+/**
+ * Response object for the GET currencies request.
+ */
 @Serializable
 data class GetCurrenciesResponse(
     val data: Map<String, CurrencySerializable>
 )
 
-
+/**
+ * Serializable representation of a currency retrieved from the API.
+ */
 @Serializable
 data class CurrencySerializable(
     val symbol: String,
