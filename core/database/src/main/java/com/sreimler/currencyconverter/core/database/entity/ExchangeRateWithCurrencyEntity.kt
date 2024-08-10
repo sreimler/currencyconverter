@@ -6,13 +6,13 @@ import androidx.room.Relation
 data class ExchangeRateWithCurrencyEntity(
     @Embedded val exchangeRateEntity: ExchangeRateEntity,
     @Relation(
-        parentColumn = "baseCurrencySymbol",
-        entityColumn = "symbol"
+        parentColumn = "baseCurrencyCode",
+        entityColumn = "code"
     )
     val baseCurrency: CurrencyEntity,
     @Relation(
-        parentColumn = "targetCurrencySymbol",
-        entityColumn = "symbol"
+        parentColumn = "targetCurrencyCode",
+        entityColumn = "code"
     )
     val targetCurrency: CurrencyEntity
 )

@@ -7,6 +7,8 @@ import com.sreimler.currencyconverter.core.domain.Currency
 import com.sreimler.currencyconverter.core.domain.LocalCurrencyDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
+
 
 class RoomLocalCurrencyDataSource(private val currencyDao: CurrencyDao) : LocalCurrencyDataSource {
 
@@ -24,15 +26,22 @@ class RoomLocalCurrencyDataSource(private val currencyDao: CurrencyDao) : LocalC
         }
     }
 
-    override fun getCurrency(symbol: String): Flow<Currency> {
-        return currencyDao.getCurrency(symbol).map { it.toCurrency() }
+    override suspend fun getCurrency(code: String): Flow<Currency?> {
+        Timber.v("Getting currency for $code")
+        return currencyDao.getCurrency(code).map { cur ->
+            cur?.toCurrency()
+        }
     }
 
-    override suspend fun deleteCurrency(symbol: String) {
-        currencyDao.deleteCurrency(symbol)
+    override suspend fun deleteCurrency(code: String) {
+        currencyDao.deleteCurrency(code)
     }
 
     override suspend fun deleteAllCurrencies() {
         currencyDao.deleteAllCurrencies()
+    }
+
+    override suspend fun setEnabled(currency: Currency, isEnabled: Boolean) {
+        currencyDao.upsertCurrency(currency.copy(isEnabled = isEnabled).toCurrencyEntity())
     }
 }

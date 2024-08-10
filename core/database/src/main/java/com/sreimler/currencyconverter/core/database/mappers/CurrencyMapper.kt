@@ -25,6 +25,7 @@ fun CurrencyEntity.toCurrency(): Currency {
         rounding = rounding,
         code = code,
         namePlural = namePlural,
-        type = type
+        type = type,
+        isEnabled = isEnabled
     )
 }

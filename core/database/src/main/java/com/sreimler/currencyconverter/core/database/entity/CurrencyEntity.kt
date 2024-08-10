@@ -5,12 +5,13 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "currency")
 data class CurrencyEntity(
-    @PrimaryKey val symbol: String,
+    val symbol: String,
     val name: String,
     val symbolNative: String,
     val decimalDigits: Int,
     val rounding: Int,
-    val code: String,
+    @PrimaryKey val code: String,
     val namePlural: String,
-    val type: String
+    val type: String,
+    val isEnabled: Boolean = true
 )

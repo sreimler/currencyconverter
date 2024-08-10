@@ -3,6 +3,7 @@ package com.sreimler.currencyconverter.core.database.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import com.sreimler.currencyconverter.core.database.entity.ExchangeRateEntity
 import com.sreimler.currencyconverter.core.database.entity.ExchangeRateWithCurrencyEntity
 import kotlinx.coroutines.flow.Flow
@@ -16,22 +17,33 @@ interface ExchangeRateDao {
     @Insert
     suspend fun insertExchangeRates(exchangeRates: List<ExchangeRateEntity>)
 
+    @Transaction
     @Query("SELECT * FROM exchangerate")
     fun getExchangeRatesWithCurrencies(): Flow<List<ExchangeRateWithCurrencyEntity>>
 
+    @Transaction
     @Query(
         """
         SELECT * FROM exchangerate 
-        GROUP BY baseCurrencySymbol, targetCurrencySymbol 
+        WHERE baseCurrencyCode = :baseCurrencyCode
+        GROUP BY targetCurrencyCode 
         HAVING dateTimeUtc = MAX(dateTimeUtc)
         """
     )
-    fun getLatestExchangeRatesWithCurrencies(): Flow<List<ExchangeRateWithCurrencyEntity>>
+    fun getLatestExchangeRatesWithCurrencies(baseCurrencyCode: String): Flow<List<ExchangeRateWithCurrencyEntity>>
 
-    @Query("SELECT * FROM exchangerate WHERE baseCurrencySymbol = :baseCurrencySymbol AND targetCurrencySymbol = :targetCurrencySymbol ORDER BY dateTimeUtc DESC LIMIT 1")
+    @Transaction
+    @Query(
+        """
+        SELECT * FROM exchangerate 
+        WHERE baseCurrencyCode = :baseCurrencyCode AND targetCurrencyCode = :targetCurrencyCode 
+        ORDER BY dateTimeUtc DESC 
+        LIMIT 1
+        """
+    )
     fun getLatestExchangeRate(
-        baseCurrencySymbol: String,
-        targetCurrencySymbol: String
+        baseCurrencyCode: String,
+        targetCurrencyCode: String
     ): Flow<ExchangeRateWithCurrencyEntity>
 
     @Query("DELETE FROM exchangerate")

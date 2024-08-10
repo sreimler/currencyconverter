@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "exchangerate")
 data class ExchangeRateEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
-    val targetCurrencySymbol: String,
-    val baseCurrencySymbol: String,
+    val targetCurrencyCode: String,
+    val baseCurrencyCode: String,
     val rate: Double,
     val dateTimeUtc: Long
 )

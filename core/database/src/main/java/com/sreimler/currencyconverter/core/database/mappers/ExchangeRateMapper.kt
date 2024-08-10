@@ -18,25 +18,16 @@ fun ExchangeRateWithCurrencyEntity.toExchangeRate(): ExchangeRate {
     return ExchangeRate(
         baseCurrency = baseCurrency.toCurrency(),
         targetCurrency = targetCurrency.toCurrency(),
-        dateTimeUtc = Instant.parse(exchangeRateEntity.dateTimeUtc.toString()).atZone(ZoneId.of("UTC")),
+        dateTimeUtc = Instant.ofEpochMilli(exchangeRateEntity.dateTimeUtc).atZone(ZoneId.of("UTC")),
         rate = exchangeRateEntity.rate
     )
 }
 
 fun ExchangeRate.toExchangeRateEntity(): ExchangeRateEntity {
     return ExchangeRateEntity(
-        baseCurrencySymbol = baseCurrency.symbol,
-        targetCurrencySymbol = targetCurrency.symbol,
+        baseCurrencyCode = baseCurrency.code,
+        targetCurrencyCode = targetCurrency.code,
         dateTimeUtc = dateTimeUtc.toInstant().toEpochMilli(),
         rate = rate
     )
 }
-
-//fun ExchangeRateEntity.toExchangeRate(): ExchangeRate {
-//    return ExchangeRate(
-//        baseCurrency = baseCurrencySymbol,
-//        targetCurrency = ,
-//        dateTimeUtc = Instant.parse(exchangeRateEntity.dateTimeUtc.toString()).atZone(ZoneId.of("UTC")),
-//        rate = exchangeRateEntity.rate
-//    )
-//}

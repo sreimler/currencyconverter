@@ -25,14 +25,14 @@ class RoomLocalExchangeRateDataSource(private val exchangeRateDao: ExchangeRateD
         }
     }
 
-    override fun getLatestExchangeRates(): Flow<List<ExchangeRate>> {
-        return exchangeRateDao.getLatestExchangeRatesWithCurrencies().map { entities ->
+    override fun getLatestExchangeRates(baseCurrency: Currency): Flow<List<ExchangeRate>> {
+        return exchangeRateDao.getLatestExchangeRatesWithCurrencies(baseCurrency.code).map { entities ->
             entities.map { it.toExchangeRate() }
         }
     }
 
     override fun getLatestExchangeRate(baseCurrency: Currency, targetCurrency: Currency): Flow<ExchangeRate> {
-        return exchangeRateDao.getLatestExchangeRate(baseCurrency.symbol, targetCurrency.symbol)
+        return exchangeRateDao.getLatestExchangeRate(baseCurrency.code, targetCurrency.code)
             .map { it.toExchangeRate() }
     }
 
