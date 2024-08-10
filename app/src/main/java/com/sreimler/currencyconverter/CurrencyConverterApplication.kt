@@ -1,6 +1,9 @@
 package com.sreimler.currencyconverter
 
 import android.app.Application
+import android.util.Log
+import com.sreimler.currencyconverter.core.data.di.dataModule
+import com.sreimler.currencyconverter.core.data.di.networkModule
 import com.sreimler.currencyconverter.core.database.di.databaseModule
 import com.sreimler.currencyconverter.di.appModule
 import com.sreimler.currencyconverter.di.viewModelModule
@@ -38,7 +41,9 @@ class CurrencyConverterApplication : Application() {
                 listOf(
                     appModule,
                     viewModelModule,
-                    databaseModule
+                    dataModule,
+                    databaseModule,
+                    networkModule
                 )
             )
         }
