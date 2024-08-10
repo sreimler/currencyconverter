@@ -65,6 +65,9 @@ dependencies {
     // Koin DI
     implementation(libs.bundles.koin)
 
+    // Preferences DataStore
+    implementation(libs.androidx.datastore)
+
     // Timber logging
     implementation(libs.timber)
 

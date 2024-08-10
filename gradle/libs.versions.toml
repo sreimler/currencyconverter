@@ -24,7 +24,9 @@ coroutines = "1.8.0"
 desugarJdkLibs = "2.0.4"
 composeCompiler = "1.5.14"
 koin = "3.5.6"
+securityCryptoKtx = "1.1.0-alpha06"
 timber = "5.0.1"
+datastore = "1.1.1"
 
 # Project versions
 projectMinSdkVersion = "25"
@@ -64,7 +66,9 @@ koin-android-workmanager = { group = "io.insert-koin", name = "koin-androidx-wor
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+androidx-security-crypto-ktx = { module = "androidx.security:security-crypto-ktx", version.ref = "securityCryptoKtx" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+androidx-datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 # Gradle
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }

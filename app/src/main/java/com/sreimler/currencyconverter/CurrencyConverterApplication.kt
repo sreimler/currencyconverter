@@ -15,7 +15,20 @@ class CurrencyConverterApplication : Application() {
         super.onCreate()
 
         if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+            Timber.plant(object : Timber.DebugTree() {
+                override fun createStackElementTag(element: StackTraceElement): String {
+                    // Include file name, line number, and method name in logs
+                    return "(${element.fileName}:${element.lineNumber})#${element.methodName}"
+                }
+            })
+        } else {
+            Timber.plant(object : Timber.Tree() {
+                override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+                    if (priority == Log.ERROR || priority == Log.WARN) {
+                        // TODO: send to crashlytics
+                    }
+                }
+            })
         }
 
         startKoin {

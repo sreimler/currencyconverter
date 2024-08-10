@@ -21,7 +21,8 @@ class AndroidRoomConventionPlugin : Plugin<Project> {
             dependencies {
                 "implementation"(libs.findLibrary("androidx-room-runtime").get())
                 "implementation"(libs.findLibrary("androidx-room-ktx").get())
-                "annotationProcessor"(libs.findLibrary("androidx-room-compiler").get())
+                //"annotationProcessor"(libs.findLibrary("androidx-room-compiler").get())
+                "ksp"(libs.findLibrary("androidx-room-compiler").get())
             }
         }
 
