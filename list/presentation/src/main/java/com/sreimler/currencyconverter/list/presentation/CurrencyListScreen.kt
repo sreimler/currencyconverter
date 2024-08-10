@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.sp
 import com.sreimler.currencyconverter.core.domain.Currency
 import com.sreimler.currencyconverter.core.domain.ExchangeRate
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
-import com.sreimler.currencyconverter.viewmodel.CurrencyListViewModel
 import org.koin.androidx.compose.koinViewModel
 import java.text.DecimalFormat
 import java.time.LocalDateTime
@@ -38,40 +37,40 @@ fun CurrencyListScreenRoot(modifier: Modifier = Modifier, viewModel: CurrencyLis
 @Composable
 fun CurrencyListScreen(modifier: Modifier = Modifier, state: State<CurrencyListState>) {
     Surface(modifier = modifier) {
-        val currenctState = state.value
-
-        when (currenctState) {
+        when (val currentState = state.value) {
             is CurrencyListState.Loading -> {}
             is CurrencyListState.Error -> {}
             is CurrencyListState.Success -> CurrencyList(
-                currenctState.exchangeRates,
-                currenctState.sourceCurrency,
-                currenctState.refreshDate
+                currentState.exchangeRates.collectAsState(initial = listOf()),
+                currentState.baseCurrency.collectAsState(initial = null),
+                currentState.refreshDate
             )
         }
     }
 }
 
 @Composable
-fun CurrencyList(exchangeRates: List<ExchangeRate>, sourceCurrency: Currency, refreshDate: LocalDateTime) {
+fun CurrencyList(exchangeRates: State<List<ExchangeRate>>, baseCurrency: State<Currency?>, refreshDate: LocalDateTime) {
     Column {
-        val (base, list) = exchangeRates.partition { it.targetCurrency == sourceCurrency }
-        CurrencyCard(currency = base.first().targetCurrency, rate = base.first().rate)
-        LazyVerticalGrid(columns = GridCells.Fixed(1)) {
-            items(items = list, key = { exchangeRate -> exchangeRate.targetCurrency.code }) { exchangeRate ->
-                CurrencyCard(currency = exchangeRate.targetCurrency, rate = exchangeRate.rate)
-            }
-        }
-        Text(
-            text = "Last update: ${dateFormatter.format(refreshDate)}",
-            textAlign = TextAlign.End,
-            fontSize = 12.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-        )
-    }
 
+        val (base, list) = exchangeRates.value.partition { it.targetCurrency == baseCurrency.value }
+        if (exchangeRates.value.isNotEmpty() && base.isNotEmpty()) {
+            CurrencyCard(currency = base.first().targetCurrency, rate = base.first().rate)
+            LazyVerticalGrid(columns = GridCells.Fixed(1)) {
+                items(items = list, key = { exchangeRate -> exchangeRate.targetCurrency.code }) { exchangeRate ->
+                    CurrencyCard(currency = exchangeRate.targetCurrency, rate = exchangeRate.rate)
+                }
+            }
+            Text(
+                text = "Last update: ${dateFormatter.format(refreshDate)}",
+                textAlign = TextAlign.End,
+                fontSize = 12.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
+            )
+        }
+    }
 }
 
 @Composable
