@@ -8,5 +8,6 @@ data class Currency(
     val rounding: Int,
     val code: String,
     val namePlural: String,
-    val type: String
+    val type: String,
+    val isEnabled: Boolean = true
 )
