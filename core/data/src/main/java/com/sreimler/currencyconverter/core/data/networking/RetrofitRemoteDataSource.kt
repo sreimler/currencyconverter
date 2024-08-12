@@ -4,16 +4,13 @@ import com.sreimler.currencyconverter.core.data.BuildConfig
 import com.sreimler.currencyconverter.core.data.mappers.toCurrency
 import com.sreimler.currencyconverter.core.domain.Currency
 import com.sreimler.currencyconverter.core.domain.ExchangeRate
-import com.sreimler.currencyconverter.core.domain.LocalCurrencyDataSource
 import com.sreimler.currencyconverter.core.domain.RemoteCurrencyDataSource
-import kotlinx.coroutines.flow.firstOrNull
 import timber.log.Timber
 import java.time.ZonedDateTime
 
 
 class RetrofitRemoteDataSource(
-    private val retrofitService: FreecurrencyApiService,
-    private val localCurrencyDataSource: LocalCurrencyDataSource
+    private val retrofitService: FreecurrencyApiService
 ) : RemoteCurrencyDataSource {
 
     override suspend fun getCurrencies(): List<Currency> {
@@ -45,21 +42,14 @@ class RetrofitRemoteDataSource(
 
         // TODO: extract update datetime from response headers?
         val dateTimeUtc = ZonedDateTime.now()
-        val exchangeRates: MutableList<ExchangeRate> = mutableListOf()
 
-        response.body()?.data?.forEach { (code, rate) ->
-            localCurrencyDataSource.getCurrency(code).firstOrNull()?.let { targetCurrency ->
-                exchangeRates.add(
-                    ExchangeRate(
-                        baseCurrency = baseCurrency,
-                        targetCurrency = targetCurrency,
-                        rate = rate,
-                        dateTimeUtc = dateTimeUtc
-                    )
-                )
-            }
-        }
-
-        return exchangeRates
+        return response.body()?.data?.mapNotNull { (code, rate) ->
+            ExchangeRate(
+                baseCurrency = baseCurrency,
+                targetCurrency = enabledCurrencies.first { it.code == code },
+                rate = rate,
+                dateTimeUtc = dateTimeUtc
+            )
+        } ?: emptyList()
     }
 }
