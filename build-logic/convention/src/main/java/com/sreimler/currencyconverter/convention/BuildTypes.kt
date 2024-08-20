@@ -33,6 +33,7 @@ internal fun Project.configureBuildTypes(
                         }
                         release {
                             configureReleaseBuildType(commonExtension, apiKey)
+                            isMinifyEnabled = true // Will throw errors if enabled for other modules than app
                         }
                     }
                 }
@@ -57,13 +58,15 @@ internal fun Project.configureBuildTypes(
 
 private fun BuildType.configureDebugBuildType(apiKey: String) {
     setBuildConfigFields(apiKey)
+
+    manifestPlaceholders["allowBackup"] = "false" // For easier reinstall on database schema changes
 }
 
 private fun BuildType.configureReleaseBuildType(commonExtension: CommonExtension<*, *, *, *, *, *>, apiKey: String) {
     setBuildConfigFields(apiKey)
 
-    isMinifyEnabled = true
     proguardFiles(commonExtension.getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+    manifestPlaceholders["allowBackup"] = "true"
 }
 
 private fun BuildType.setBuildConfigFields(apiKey: String) {
