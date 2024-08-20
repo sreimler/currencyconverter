@@ -6,7 +6,7 @@
 
     <application
         android:name=".CurrencyConverterApplication"
-        android:allowBackup="true"
+        android:allowBackup="${allowBackup}"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/ic_launcher"
