@@ -1,9 +1,13 @@
+@file:OptIn(InternalSerializationApi::class)
+
 package com.sreimler.currencyconverter.core.data.networking
 
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 
 typealias Code = String
 typealias Rate = Double
+
 
 /**
  * Response object for the GET exchange rate request.

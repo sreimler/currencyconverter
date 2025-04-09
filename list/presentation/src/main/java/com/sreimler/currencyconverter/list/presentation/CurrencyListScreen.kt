@@ -2,13 +2,16 @@ package com.sreimler.currencyconverter.list.presentation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -22,48 +25,66 @@ import com.sreimler.currencyconverter.core.domain.ExchangeRate
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
 import org.koin.androidx.compose.koinViewModel
 import java.text.DecimalFormat
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 private val decimalFormat = DecimalFormat("#,##0.0000")
 private val dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CurrencyListScreenRoot(modifier: Modifier = Modifier, viewModel: CurrencyListViewModel = koinViewModel()) {
-    CurrencyListScreen(state = viewModel.state.collectAsState())
+fun CurrencyListScreenRoot(
+    modifier: Modifier = Modifier,
+    viewModel: CurrencyListViewModel = koinViewModel()
+) {
+    val state = viewModel.state.collectAsState().value
+    PullToRefreshBox(
+        isRefreshing = state.isRefreshing,
+        onRefresh = viewModel::updateExchangeRates
+    ) {
+        CurrencyListScreen(state = viewModel.state.collectAsState().value, modifier = modifier)
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CurrencyListScreen(modifier: Modifier = Modifier, state: State<CurrencyListState>) {
+fun CurrencyListScreen(modifier: Modifier = Modifier, state: CurrencyListState) {
+
     Surface(modifier = modifier) {
-        when (val currentState = state.value) {
-            is CurrencyListState.Loading -> {}
-            is CurrencyListState.Error -> {}
-            is CurrencyListState.Success -> CurrencyList(
-                currentState.exchangeRates.collectAsState(initial = listOf()),
-                currentState.baseCurrency.collectAsState(initial = null),
-                currentState.refreshDate
-            )
-        }
+        CurrencyList(
+            state.exchangeRates.collectAsState(initial = listOf()),
+            state.baseCurrency.collectAsState(initial = null),
+            state.refreshDate.collectAsState(initial = null)
+        )
     }
 }
 
 @Composable
-fun CurrencyList(exchangeRates: State<List<ExchangeRate>>, baseCurrency: State<Currency?>, refreshDate: LocalDateTime) {
-    Column {
-
+fun CurrencyList(
+    exchangeRates: State<List<ExchangeRate>>,
+    baseCurrency: State<Currency?>,
+    refreshDate: State<ZonedDateTime?>
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
         val (base, list) = exchangeRates.value.partition { it.targetCurrency == baseCurrency.value }
-        if (exchangeRates.value.isNotEmpty() && base.isNotEmpty()) {
+
+        if (exchangeRates.value.isNotEmpty() && base.isNotEmpty() && refreshDate.value != null) {
             CurrencyCard(currency = base.first().targetCurrency, rate = base.first().rate)
-            LazyVerticalGrid(columns = GridCells.Fixed(1)) {
-                items(items = list, key = { exchangeRate -> exchangeRate.targetCurrency.code }) { exchangeRate ->
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(1),
+                modifier = Modifier.weight(1f) // Ensures the grid takes up available space
+            ) {
+                items(
+                    items = list.sortedBy { it.targetCurrency.name },
+                    key = { exchangeRate -> exchangeRate.targetCurrency.code }) { exchangeRate ->
                     CurrencyCard(currency = exchangeRate.targetCurrency, rate = exchangeRate.rate)
                 }
             }
+
             Text(
-                text = "Last update: ${dateFormatter.format(refreshDate)}",
-                textAlign = TextAlign.End,
+                text = "Last update: ${dateFormatter.format(refreshDate.value)}",
+                textAlign = TextAlign.Center,
                 fontSize = 12.sp,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -77,7 +98,11 @@ fun CurrencyList(exchangeRates: State<List<ExchangeRate>>, baseCurrency: State<C
 fun CurrencyCard(currency: Currency, rate: Double) {
     Row {
         Text(text = "${currency.name} (${currency.symbol})", modifier = Modifier.weight(1f))
-        Text(text = decimalFormat.format(rate), modifier = Modifier.weight(1f), textAlign = TextAlign.End)
+        Text(
+            text = decimalFormat.format(rate),
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.End
+        )
     }
 }
 

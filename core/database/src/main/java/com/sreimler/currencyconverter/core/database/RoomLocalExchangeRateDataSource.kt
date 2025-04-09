@@ -36,6 +36,14 @@ class RoomLocalExchangeRateDataSource(private val exchangeRateDao: ExchangeRateD
             .map { it.toExchangeRate() }
     }
 
+    override fun getLastUpdateTime(baseCurrency: Currency): Flow<Long> {
+        return exchangeRateDao.getLatestExchangeRatesWithCurrencies(baseCurrency.code)
+            .map { entities ->
+                entities.maxByOrNull { it.exchangeRateEntity.dateTimeUtc }?.exchangeRateEntity?.dateTimeUtc
+                    ?: 0L
+            }
+    }
+
     override suspend fun deleteAllExchangeRates() {
         exchangeRateDao.deleteAllExchangeRates()
     }

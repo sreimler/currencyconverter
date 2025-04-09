@@ -87,7 +87,6 @@ fun CurrencyConversionApp() {
                 .fillMaxSize()
                 .padding(it)
                 .padding(horizontal = 16.dp)
-                .padding(top = 24.dp)
         ) {
             composable(route = Screen.LIST.name) {
                 CurrencyListScreenRoot()

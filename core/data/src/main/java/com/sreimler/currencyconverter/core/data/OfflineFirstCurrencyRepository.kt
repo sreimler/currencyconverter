@@ -7,6 +7,7 @@ import com.sreimler.currencyconverter.core.domain.LocalBaseCurrencyStorage
 import com.sreimler.currencyconverter.core.domain.LocalCurrencyDataSource
 import com.sreimler.currencyconverter.core.domain.LocalExchangeRateDataSource
 import com.sreimler.currencyconverter.core.domain.RemoteCurrencyDataSource
+import com.sreimler.currencyconverter.core.domain.policy.SyncPolicy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -51,7 +52,13 @@ class OfflineFirstCurrencyRepository(
     override suspend fun getLatestExchangeRates(): Flow<List<ExchangeRate>> {
         Timber.d("invoked")
         val rates = localExchangeRateDataSource.getLatestExchangeRates(getBaseCurrency().first())
+
+        // Fetch exchange rates if none available or if outdated
         if (rates.first().isEmpty()) {
+            Timber.i("No exchange rates in local repository - fetching from remote")
+            fetchExchangeRates()
+        } else if (SyncPolicy.isDataStale(getLastUpdateTime().first())) {
+            Timber.i("Local exchange rates are outdated - fetching from remote")
             fetchExchangeRates()
         }
 
@@ -63,6 +70,14 @@ class OfflineFirstCurrencyRepository(
      */
     override suspend fun fetchExchangeRates() {
         Timber.d("invoked")
+
+        // Prevent too frequent synchronizations
+        if (!SyncPolicy.isRefreshAllowed(getLastUpdateTime().first())) {
+            Timber.i("Refresh interval too short - will not fetch from remote")
+            // TODO: handle this case, e.g., emit a Result.Error
+            return
+        }
+
         val baseCurrency = getBaseCurrency().first()
         val enabledCurrencies = getCurrencies().first().filter { it.isEnabled }
         val exchangeRates = remoteCurrencyDataSource.getExchangeRates(baseCurrency, enabledCurrencies)
@@ -107,5 +122,9 @@ class OfflineFirstCurrencyRepository(
      */
     override suspend fun setBaseCurrency(currency: Currency) {
         baseCurrencyStorage.set(currency.symbol)
+    }
+
+    override suspend fun getLastUpdateTime(): Flow<Long> {
+        return localExchangeRateDataSource.getLastUpdateTime(getBaseCurrency().first())
     }
 }

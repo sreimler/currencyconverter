@@ -9,4 +9,5 @@ interface CurrencyRepository {
     suspend fun fetchExchangeRates() // TODO: implement result type
     suspend fun getBaseCurrency(): Flow<Currency>
     suspend fun setBaseCurrency(currency: Currency)
+    suspend fun getLastUpdateTime(): Flow<Long>
 }
