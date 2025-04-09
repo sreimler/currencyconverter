@@ -21,7 +21,7 @@ class CurrencyConverterApplication : Application() {
             Timber.plant(object : Timber.DebugTree() {
                 override fun createStackElementTag(element: StackTraceElement): String {
                     // Include file name, line number, and method name in logs
-                    return "(${element.fileName}:${element.lineNumber})#${element.methodName}"
+                    return "(${element.fileName}:${element.lineNumber}) #${element.methodName}"
                 }
             })
         } else {
