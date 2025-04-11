@@ -11,6 +11,7 @@ private const val PRIVACY_POLICY_URL = "https://www.iubenda.com/privacy-policy/6
 
 @Composable
 fun InfoScreen(modifier: Modifier = Modifier) {
+    // TODO: move to settings module
     Surface(modifier = modifier) {
         AndroidView(
             factory = { context ->

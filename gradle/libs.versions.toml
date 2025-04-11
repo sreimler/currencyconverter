@@ -8,6 +8,7 @@ espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2025.03.01"
+materialIconsExtended = "1.7.8"
 navigationCompose = "2.8.9"
 okhttp = "4.12.0"
 retrofit = "2.10.0"
@@ -34,6 +35,7 @@ projectCompileSdkVersion = "35"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
@@ -96,9 +98,11 @@ compose = [
     "androidx-lifecycle-runtime-compose",
     "androidx-lifecycle-viewmodel-compose",
     "androidx-material3",
+    "androidx-material-icons-extended",
     "androidx-ui",
     "androidx-ui-graphics",
     "androidx-ui-tooling-preview",
+    "androidx-navigation-compose"
 ]
 compose-debug = [
     "androidx-ui-tooling",

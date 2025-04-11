@@ -1,5 +1,7 @@
+@file:OptIn(InternalSerializationApi::class)
 package com.sreimler.currencyconverter.core.data.networking
 
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

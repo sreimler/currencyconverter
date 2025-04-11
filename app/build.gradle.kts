@@ -47,9 +47,9 @@ dependencies {
     implementation(projects.core.presentation)
     implementation(projects.core.database)
 
-    implementation(projects.list.domain)
-    implementation(projects.list.data)
-    implementation(projects.list.presentation)
+    implementation(projects.rates.domain)
+    implementation(projects.rates.data)
+    implementation(projects.rates.presentation)
 
     implementation(projects.converter.domain)
     implementation(projects.converter.data)
@@ -58,14 +58,17 @@ dependencies {
     // Core
     implementation(libs.androidx.core.ktx)
 
-    // Compose
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    // Navigation
     implementation(libs.androidx.navigation.compose)
+
+    // Compose
+    implementation(libs.androidx.material3) // TODO: Remove when settings have been refactored into a module
+//    implementation(libs.androidx.lifecycle.runtime.ktx)
+//    implementation(libs.androidx.activity.compose)
+//    implementation(libs.androidx.ui)
+//    implementation(libs.androidx.ui.graphics)
+//    implementation(libs.androidx.ui.tooling.preview)
+//    implementation(libs.androidx.material.icons.extended) // or latest
 
     // Koin DI
     implementation(libs.bundles.koin)

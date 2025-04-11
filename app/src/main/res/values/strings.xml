@@ -1,8 +1,3 @@
 <resources>
     <string name="app_name">Currency Converter</string>
-    <string name="currency_list">Current Conversion Rates</string>
-    <string name="currency_conversion">Currency Conversion</string>
-    <string name="convert">Convert</string>
-    <string name="back_button">Back</string>
-    <string name="info">Privacy Policy</string>
 </resources>

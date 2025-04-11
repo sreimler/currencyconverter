@@ -1,22 +1,15 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package com.sreimler.currencyconverter.converter.presentation
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text2.BasicTextField2
-import androidx.compose.foundation.text2.input.TextFieldState
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.sreimler.currencyconverter.core.domain.Currency
 import org.koin.androidx.compose.koinViewModel
@@ -25,7 +18,10 @@ import java.text.DecimalFormat
 private val df = DecimalFormat("#,##0.00")
 
 @Composable
-fun ConverterScreenRoot(modifier: Modifier = Modifier, viewModel: ConverterViewModel = koinViewModel()) {
+fun ConverterScreenRoot(
+    modifier: Modifier = Modifier,
+    viewModel: ConverterViewModel = koinViewModel()
+) {
     ConverterScreen(state = viewModel.state)
 }
 
@@ -70,20 +66,20 @@ fun CurrencyRow(currency: Currency, textFieldState: TextFieldState) {
         //    )
         //}
 
-        BasicTextField2(
-            //value = df.format(amount),
-            //onValueChange = { viewModel.(it, currency) },
-            state = textFieldState,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Decimal
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            //interactionSource = interactionSource,
-            textStyle = MaterialTheme.typography.headlineLarge.copy(textAlign = TextAlign.End),
-            //label = { Text(currency.code) }
-        )
+//        BasicTextField2(
+//            //value = df.format(amount),
+//            //onValueChange = { viewModel.(it, currency) },
+//            state = textFieldState,
+//            keyboardOptions = KeyboardOptions(
+//                keyboardType = KeyboardType.Decimal
+//            ),
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .weight(1f),
+//            //interactionSource = interactionSource,
+//            textStyle = MaterialTheme.typography.headlineLarge.copy(textAlign = TextAlign.End),
+//            //label = { Text(currency.code) }
+//        )
 
     }
 }
