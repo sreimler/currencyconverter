@@ -1,4 +1,4 @@
-package com.sreimler.currencyconverter.list.presentation
+package com.sreimler.currencyconverter.rates.presentation
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

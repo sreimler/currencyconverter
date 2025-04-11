@@ -1,4 +1,4 @@
-package com.sreimler.currencyconverter.list.data
+package com.sreimler.currencyconverter.rates.data
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.sreimler.currencyconverter.list.data.test", appContext.packageName)
+        assertEquals("com.sreimler.currencyconverter.rates.data.test", appContext.packageName)
     }
 }

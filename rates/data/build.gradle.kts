@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.sreimler.currencyconverter.list.data"
+    namespace = "com.sreimler.currencyconverter.rates.data"
 }
 
 dependencies {

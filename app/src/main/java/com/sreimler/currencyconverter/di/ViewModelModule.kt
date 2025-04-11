@@ -1,7 +1,7 @@
 package com.sreimler.currencyconverter.di
 
 import com.sreimler.currencyconverter.converter.presentation.ConverterViewModel
-import com.sreimler.currencyconverter.list.presentation.CurrencyListViewModel
+import com.sreimler.currencyconverter.rates.presentation.CurrencyListViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
 

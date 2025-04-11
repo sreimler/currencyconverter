@@ -1,4 +1,4 @@
-package com.sreimler.currencyconverter.list.presentation
+package com.sreimler.currencyconverter.rates.presentation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

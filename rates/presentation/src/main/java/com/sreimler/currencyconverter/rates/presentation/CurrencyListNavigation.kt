@@ -1,4 +1,4 @@
-package com.sreimler.currencyconverter.list.presentation
+package com.sreimler.currencyconverter.rates.presentation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable

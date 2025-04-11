@@ -11,7 +11,7 @@ import androidx.navigation.compose.composable
 import com.sreimler.currencyconverter.InfoScreen
 import com.sreimler.currencyconverter.converter.presentation.converterNavigation
 import com.sreimler.currencyconverter.core.presentation.Screen
-import com.sreimler.currencyconverter.list.presentation.ratesNavigation
+import com.sreimler.currencyconverter.rates.presentation.ratesNavigation
 
 @Composable
 fun MainNavHost(navController: NavHostController) {
