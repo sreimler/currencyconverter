@@ -55,7 +55,6 @@ fun CurrencyListScreenRoot(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrencyListScreen(modifier: Modifier = Modifier, state: CurrencyListState) {
-
     Surface(modifier = modifier) {
         CurrencyList(
             state.exchangeRates.collectAsState(initial = listOf()),
