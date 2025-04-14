@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sreimler.currencyconverter.core.domain.Currency
 import com.sreimler.currencyconverter.core.domain.CurrencyRepository
+import com.sreimler.currencyconverter.core.presentation.models.toCurrencyUi
+import com.sreimler.currencyconverter.core.presentation.models.toExchangeRateUi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,7 +19,6 @@ import java.io.IOException
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
-
 
 class CurrencyListViewModel(private val currencyRepository: CurrencyRepository) : ViewModel() {
 
@@ -33,7 +34,9 @@ class CurrencyListViewModel(private val currencyRepository: CurrencyRepository) 
             try {
                 _state.update { it.copy(isRefreshing = true) }
 
-                val baseCurrency = currencyRepository.getBaseCurrency()
+                val baseCurrency = currencyRepository.getBaseCurrency().map { currency ->
+                    currency.toCurrencyUi()
+                }
                 val rates = currencyRepository.getLatestExchangeRates()
                 val refreshDate = currencyRepository.getLastUpdateTime().map { timestamp ->
                     ZonedDateTime.ofInstant(
@@ -43,9 +46,11 @@ class CurrencyListViewModel(private val currencyRepository: CurrencyRepository) 
                 }
                 _state.update {
                     it.copy(
-                    exchangeRates = rates,
+                        exchangeRates = rates.map { exchangeRates ->
+                            exchangeRates.map { it.toExchangeRateUi() }
+                        },
                         refreshDate = refreshDate,
-                    baseCurrency = baseCurrency
+                        baseCurrency = baseCurrency
                     )
                 }
             } catch (e: IOException) {

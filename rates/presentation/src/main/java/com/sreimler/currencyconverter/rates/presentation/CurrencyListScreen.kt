@@ -1,10 +1,13 @@
 package com.sreimler.currencyconverter.rates.presentation
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -15,21 +18,23 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sreimler.currencyconverter.core.domain.Currency
-import com.sreimler.currencyconverter.core.domain.ExchangeRate
+import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
+import com.sreimler.currencyconverter.core.presentation.models.ExchangeRateUi
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
+import com.sreimler.currencyconverter.core.presentation.util.toFormattedUiString
 import org.koin.androidx.compose.koinViewModel
-import java.text.DecimalFormat
+import timber.log.Timber
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-private val decimalFormat = DecimalFormat("#,##0.0000")
 private val dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,15 +67,15 @@ fun CurrencyListScreen(modifier: Modifier = Modifier, state: CurrencyListState) 
 
 @Composable
 fun CurrencyList(
-    exchangeRates: State<List<ExchangeRate>>,
-    baseCurrency: State<Currency?>,
+    exchangeRates: State<List<ExchangeRateUi>>,
+    baseCurrency: State<CurrencyUi?>,
     refreshDate: State<ZonedDateTime?>
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         val (base, list) = exchangeRates.value.partition { it.targetCurrency == baseCurrency.value }
 
         if (exchangeRates.value.isNotEmpty() && base.isNotEmpty() && refreshDate.value != null) {
-            CurrencyCard(currency = base.first().targetCurrency, rate = base.first().rate)
+            CurrencyCard(currency = base.first().targetCurrency, exchangeRate = base.first())
             LazyVerticalGrid(
                 columns = GridCells.Fixed(1),
                 modifier = Modifier.weight(1f) // Ensures the grid takes up available space
@@ -78,7 +83,7 @@ fun CurrencyList(
                 items(
                     items = list.sortedBy { it.targetCurrency.name },
                     key = { exchangeRate -> exchangeRate.targetCurrency.code }) { exchangeRate ->
-                    CurrencyCard(currency = exchangeRate.targetCurrency, rate = exchangeRate.rate)
+                    CurrencyCard(currency = exchangeRate.targetCurrency, exchangeRate = exchangeRate)
                 }
             }
 
@@ -95,11 +100,23 @@ fun CurrencyList(
 }
 
 @Composable
-fun CurrencyCard(currency: Currency, rate: Double) {
-    Row {
-        Text(text = "${currency.name} (${currency.symbol})", modifier = Modifier.weight(1f))
+fun CurrencyCard(currency: CurrencyUi, exchangeRate: ExchangeRateUi) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Image(
+            painter = painterResource(id = currency.flagRes),
+            contentDescription = currency.name
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = currency.name, modifier = Modifier.weight(1f))
+        Timber.d(
+            "Currency: ${currency.name}, Decimal Digits: ${currency.decimalDigits} Rate: ${exchangeRate.rate}, Formatted: ${
+                exchangeRate.rate.toFormattedUiString(
+                    currency.decimalDigits
+                )
+            }"
+        )
         Text(
-            text = decimalFormat.format(rate),
+            text = "${currency.symbolNative} ${exchangeRate.rate.toFormattedUiString(currency.decimalDigits)}",
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.End
         )
