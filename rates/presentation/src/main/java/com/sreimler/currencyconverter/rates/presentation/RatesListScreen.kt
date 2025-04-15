@@ -45,24 +45,24 @@ private val dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.ME
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CurrencyListScreenRoot(
+fun RatesListScreenRoot(
     modifier: Modifier = Modifier,
-    viewModel: CurrencyListViewModel = koinViewModel()
+    viewModel: RatesViewModel = koinViewModel()
 ) {
     val state = viewModel.state.collectAsState().value
     PullToRefreshBox(
         isRefreshing = state.isRefreshing,
         onRefresh = viewModel::updateExchangeRates
     ) {
-        CurrencyListScreen(state = viewModel.state.collectAsState().value, modifier = modifier)
+        RatesListScreen(state = viewModel.state.collectAsState().value, modifier = modifier)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CurrencyListScreen(modifier: Modifier = Modifier, state: CurrencyListState) {
+fun RatesListScreen(modifier: Modifier = Modifier, state: RatesListState) {
     Surface(modifier = modifier) {
-        CurrencyList(
+        RatesList(
             state.exchangeRates.collectAsState(initial = listOf()),
             state.baseCurrency.collectAsState(initial = null),
             state.refreshDate.collectAsState(initial = null)
@@ -71,7 +71,7 @@ fun CurrencyListScreen(modifier: Modifier = Modifier, state: CurrencyListState) 
 }
 
 @Composable
-fun CurrencyList(
+fun RatesList(
     exchangeRates: State<List<ExchangeRateUi>>,
     baseCurrency: State<CurrencyUi?>,
     refreshDate: State<ZonedDateTime?>
@@ -140,7 +140,7 @@ fun ListScreenPreview() {
                     .fillMaxSize()
                     .padding(horizontal = 16.dp) // Padding applied only to content
             ) {
-                CurrencyList(
+                RatesList(
                     exchangeRates = MutableStateFlow(EXCHANGE_RATES.map { it.toExchangeRateUi() }).collectAsState(),
                     baseCurrency = MutableStateFlow(CURRENCY_USD.toCurrencyUi()).collectAsState(),
                     refreshDate = MutableStateFlow(ZonedDateTime.now()).collectAsState()

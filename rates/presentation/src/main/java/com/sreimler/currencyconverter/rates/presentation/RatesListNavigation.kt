@@ -6,6 +6,6 @@ import com.sreimler.currencyconverter.core.presentation.Screen
 
 fun NavGraphBuilder.ratesNavigation() {
     composable(route = Screen.Rates.route) {
-        CurrencyListScreenRoot()
+        RatesListScreenRoot()
     }
 }

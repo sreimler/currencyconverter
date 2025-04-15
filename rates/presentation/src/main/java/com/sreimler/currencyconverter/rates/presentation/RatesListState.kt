@@ -9,7 +9,7 @@ import java.time.ZonedDateTime
 
 // Add immutable annotation to make sure that the unstable List does not cause frequent recompositions
 @Immutable
-data class CurrencyListState(
+data class RatesListState(
     val isRefreshing: Boolean = false,
     val exchangeRates: Flow<List<ExchangeRateUi>> = flow { },
     val baseCurrency: Flow<CurrencyUi> = flow { },

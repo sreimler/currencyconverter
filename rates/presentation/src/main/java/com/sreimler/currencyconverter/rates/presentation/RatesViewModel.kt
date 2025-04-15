@@ -20,12 +20,12 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-class CurrencyListViewModel(private val currencyRepository: CurrencyRepository) : ViewModel() {
+class RatesViewModel(private val currencyRepository: CurrencyRepository) : ViewModel() {
 
-    private val _state = MutableStateFlow(CurrencyListState())
+    private val _state = MutableStateFlow(RatesListState())
     val state = _state
         .onStart { getExchangeRates() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CurrencyListState())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), RatesListState())
 
 //    private val currencies = currencyRepository.getCurrencies()
 
