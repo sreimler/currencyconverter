@@ -12,7 +12,7 @@ import java.time.ZonedDateTime
 data class CurrencyListState(
     val isRefreshing: Boolean = false,
     val exchangeRates: Flow<List<ExchangeRateUi>> = flow { },
-    val baseCurrency: Flow<CurrencyUi?> = flow { },
+    val baseCurrency: Flow<CurrencyUi> = flow { },
     val sourceAmount: Double = 0.0,
     val targetAmount: Double = 0.0,
     val refreshDate: Flow<ZonedDateTime> = flow { }

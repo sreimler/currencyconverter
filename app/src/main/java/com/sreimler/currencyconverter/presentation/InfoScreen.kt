@@ -1,4 +1,4 @@
-package com.sreimler.currencyconverter
+package com.sreimler.currencyconverter.presentation
 
 import android.webkit.WebView
 import android.webkit.WebViewClient

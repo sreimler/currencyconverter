@@ -8,9 +8,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.sreimler.currencyconverter.InfoScreen
 import com.sreimler.currencyconverter.converter.presentation.converterNavigation
 import com.sreimler.currencyconverter.core.presentation.Screen
+import com.sreimler.currencyconverter.presentation.InfoScreen
 import com.sreimler.currencyconverter.rates.presentation.ratesNavigation
 
 @Composable

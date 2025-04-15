@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -25,10 +26,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sreimler.currencyconverter.core.domain.mock.CurrencyMock.CURRENCY_USD
+import com.sreimler.currencyconverter.core.domain.mock.ExchangeRateMock.EXCHANGE_RATES
 import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.ExchangeRateUi
+import com.sreimler.currencyconverter.core.presentation.models.toCurrencyUi
+import com.sreimler.currencyconverter.core.presentation.models.toExchangeRateUi
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
 import com.sreimler.currencyconverter.core.presentation.util.toFormattedUiString
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 import java.time.ZonedDateTime
@@ -116,7 +122,6 @@ fun CurrencyCard(currency: CurrencyUi, exchangeRate: ExchangeRateUi) {
         )
         Text(
             text = "${currency.symbolNative} ${exchangeRate.rate.toFormattedUiString(currency.decimalDigits)}",
-            modifier = Modifier.weight(1f),
             textAlign = TextAlign.End
         )
     }
@@ -126,6 +131,21 @@ fun CurrencyCard(currency: CurrencyUi, exchangeRate: ExchangeRateUi) {
 @Composable
 fun ListScreenPreview() {
     CurrencyConverterTheme {
-        CurrencyListScreenRoot()
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp) // Padding applied only to content
+            ) {
+                CurrencyList(
+                    exchangeRates = MutableStateFlow(EXCHANGE_RATES.map { it.toExchangeRateUi() }).collectAsState(),
+                    baseCurrency = MutableStateFlow(CURRENCY_USD.toCurrencyUi()).collectAsState(),
+                    refreshDate = MutableStateFlow(ZonedDateTime.now()).collectAsState()
+                )
+            }
+        }
     }
 }
