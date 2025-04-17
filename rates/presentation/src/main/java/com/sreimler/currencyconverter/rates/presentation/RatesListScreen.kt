@@ -19,6 +19,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -49,12 +50,12 @@ fun RatesListScreenRoot(
     modifier: Modifier = Modifier,
     viewModel: RatesViewModel = koinViewModel()
 ) {
-    val state = viewModel.state.collectAsState().value
+    val state by viewModel.state.collectAsState()
     PullToRefreshBox(
         isRefreshing = state.isRefreshing,
         onRefresh = viewModel::updateExchangeRates
     ) {
-        RatesListScreen(state = viewModel.state.collectAsState().value, modifier = modifier)
+        RatesListScreen(state = state, modifier = modifier)
     }
 }
 

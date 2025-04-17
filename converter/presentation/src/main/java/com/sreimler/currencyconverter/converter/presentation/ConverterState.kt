@@ -1,14 +1,21 @@
 package com.sreimler.currencyconverter.converter.presentation
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.text.input.TextFieldState
-//import androidx.compose.foundation.text2.input.TextFieldState
-import com.sreimler.currencyconverter.core.domain.Currency
+import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
+import com.sreimler.currencyconverter.core.presentation.models.ExchangeRateUi
 
-@OptIn(ExperimentalFoundationApi::class)
 data class ConverterState(
-    val sourceCurrency: Currency? = null,
-    val sourceAmount: TextFieldState = TextFieldState(),
-    val targetCurrency: Currency? = null,
-    val targetAmount: TextFieldState = TextFieldState()
+    val isLoading: Boolean = true,
+    val currencyList: List<CurrencyUi> = emptyList(),
+    val exchangeRateList: List<ExchangeRateUi> = emptyList(),
+    val baseCurrency: CurrencyUi? = null,
+    val sourceCurrency: CurrencyUi? = null,
+    val targetCurrency: CurrencyUi? = null,
+    val sourceAmount: Double = 1.0,
+    val targetAmount: Double = 1.0,
+    val exchangeRate: Double = 0.0
 )
+
+enum class AmountField {
+    SOURCE,
+    TARGET
+}

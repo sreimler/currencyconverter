@@ -4,7 +4,7 @@ import com.sreimler.currencyconverter.core.domain.ExchangeRate
 import java.time.ZonedDateTime
 
 object ExchangeRateMock {
-    val EXCHANGE_RATES = CurrencyMock.currencies.map { targetCurrency ->
+    val EXCHANGE_RATES = CurrencyMock.CURRENCY_LIST.map { targetCurrency ->
         ExchangeRate(
             baseCurrency = CurrencyMock.CURRENCY_USD,
             targetCurrency = targetCurrency,

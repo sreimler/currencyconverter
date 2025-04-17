@@ -113,7 +113,7 @@ object CurrencyMock {
         type = "fiat"
     )
 
-    val currencies = listOf(
+    val CURRENCY_LIST = listOf(
         CURRENCY_USD,
         CURRENCY_EUR,
         CURRENCY_GBP,

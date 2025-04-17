@@ -1,91 +1,235 @@
 package com.sreimler.currencyconverter.converter.presentation
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.sreimler.currencyconverter.core.domain.Currency
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.sreimler.currencyconverter.core.domain.mock.CurrencyMock.CURRENCY_EUR
+import com.sreimler.currencyconverter.core.domain.mock.CurrencyMock.CURRENCY_LIST
+import com.sreimler.currencyconverter.core.domain.mock.CurrencyMock.CURRENCY_USD
+import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
+import com.sreimler.currencyconverter.core.presentation.models.toCurrencyUi
+import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
 import org.koin.androidx.compose.koinViewModel
 import java.text.DecimalFormat
-
-private val df = DecimalFormat("#,##0.00")
 
 @Composable
 fun ConverterScreenRoot(
     modifier: Modifier = Modifier,
     viewModel: ConverterViewModel = koinViewModel()
 ) {
-    ConverterScreen(state = viewModel.state)
+    val state by viewModel.state.collectAsState()
+
+    if (state.isLoading) {
+        CircularProgressIndicator()
+    } else {
+        ConverterScreen(
+            state = state,
+            onValueChange = viewModel::onAmountChanged,
+            onCurrencySelected = viewModel::onCurrencySelected,
+            modifier = modifier
+        )
+    }
 }
 
 @Composable
-fun ConverterScreen(modifier: Modifier = Modifier, state: ConverterState) {
+fun ConverterScreen(
+    modifier: Modifier = Modifier,
+    state: ConverterState,
+    onValueChange: (AmountField, String) -> Unit,
+    onCurrencySelected: (AmountField, CurrencyUi) -> Unit
+) {
     Surface(modifier = modifier) {
-        if (state.sourceCurrency != null && state.targetCurrency != null) {
-            Column {
-                CurrencyRow(currency = state.sourceCurrency, textFieldState = state.sourceAmount)
-                CurrencyRow(currency = state.targetCurrency, textFieldState = state.targetAmount)
+        Column {
+            state.sourceCurrency?.let {
+                CurrencyRow(
+                    field = AmountField.SOURCE,
+                    amount = state.sourceAmount,
+                    currency = it,
+                    currencyList = state.currencyList,
+                    onAmountChanged = onValueChange,
+                    onCurrencySelected = onCurrencySelected
+                )
+            }
+
+            state.targetCurrency?.let {
+                CurrencyRow(
+                    field = AmountField.TARGET,
+                    amount = state.targetAmount,
+                    currency = it,
+                    currencyList = state.currencyList,
+                    onAmountChanged = onValueChange,
+                    onCurrencySelected = onCurrencySelected
+                )
             }
         }
     }
 }
 
 @Composable
-fun CurrencyRow(currency: Currency, textFieldState: TextFieldState) {
-    Row(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = currency.name,
-            style = MaterialTheme.typography.headlineLarge,
+fun CurrencyRow(
+    field: AmountField,
+    amount: Double,
+    currency: CurrencyUi,
+    currencyList: List<CurrencyUi>,
+    onAmountChanged: (AmountField, String) -> Unit,
+    onCurrencySelected: (AmountField, CurrencyUi) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = 16.dp)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline, // or any color you like
+                shape = RoundedCornerShape(12.dp)
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
             modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .weight(1f)
+                .clickable { expanded = !expanded }
+                .padding(start = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = currency.flagRes),
+                contentDescription = currency.name,
+                modifier = Modifier.size(32.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = currency.code,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                modifier = Modifier.size(32.dp)
+            )
+
+            CurrencyDropdown(
+                expanded = expanded,
+                currencyList = currencyList,
+                onDismiss = { expanded = false },
+                onSelect = {
+                    expanded = false
+                    onCurrencySelected(field, it)
+                }
+            )
+        }
+
+        TextField(
+            value = if (amount == 0.0) "" else DecimalFormat("0.00").format(amount),
+            onValueChange = { onAmountChanged(field, it) },
+            modifier = Modifier.weight(1f),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                errorContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
+                errorIndicatorColor = Color.Transparent
+            ),
+            textStyle = LocalTextStyle.current.copy(
+                textAlign = TextAlign.End,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
         )
+    }
+}
 
-        // This does not allow to set the text cursor
-        // TODO: fix!
-        //var textFieldValue by remember(key1 = amount) { mutableStateOf(TextFieldValue(df.format(amount))) }
-        //val interactionSource = remember { MutableInteractionSource() }
-        //val isFocused by interactionSource.collectIsFocusedAsState()
-        //
-        //// Select whole input text when gaining focus
-        //LaunchedEffect(isFocused) {
-        //    val endRange = if (isFocused) textFieldValue.text.length else 0
-        //
-        //    textFieldValue = textFieldValue.copy(
-        //        selection = TextRange(
-        //            start = 0,
-        //            end = endRange
-        //        )
-        //    )
-        //}
 
-//        BasicTextField2(
-//            //value = df.format(amount),
-//            //onValueChange = { viewModel.(it, currency) },
-//            state = textFieldState,
-//            keyboardOptions = KeyboardOptions(
-//                keyboardType = KeyboardType.Decimal
-//            ),
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .weight(1f),
-//            //interactionSource = interactionSource,
-//            textStyle = MaterialTheme.typography.headlineLarge.copy(textAlign = TextAlign.End),
-//            //label = { Text(currency.code) }
-//        )
-
+@Composable
+fun CurrencyDropdown(
+    expanded: Boolean,
+    currencyList: List<CurrencyUi>,
+    onDismiss: () -> Unit,
+    onSelect: (CurrencyUi) -> Unit
+) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismiss
+    ) {
+        currencyList.forEach { currency ->
+            DropdownMenuItem(
+                leadingIcon = {
+                    Image(
+                        painter = painterResource(id = currency.flagRes),
+                        contentDescription = currency.name
+                    )
+                },
+                text = { Text(currency.code) },
+                onClick = { onSelect(currency) }
+            )
+        }
     }
 }
 
 @Preview
 @Composable
 fun ConverterScreenPreview() {
-    ConverterScreen(state = ConverterState()) // TODO: emulate currencies
+    CurrencyConverterTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            ConverterScreen(
+                state = ConverterState(
+                    currencyList = CURRENCY_LIST.map { it.toCurrencyUi() },
+                    sourceCurrency = CURRENCY_USD.toCurrencyUi(),
+                    sourceAmount = 123.53,
+                    targetCurrency = CURRENCY_EUR.toCurrencyUi(),
+                    targetAmount = 210.01
+                ),
+                onValueChange = { _, _ -> },
+                onCurrencySelected = { _, _ -> }
+            )
+        }
+    }
 }
