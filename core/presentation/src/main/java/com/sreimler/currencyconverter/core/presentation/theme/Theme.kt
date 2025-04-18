@@ -5,7 +5,7 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,22 +59,28 @@ object ProgressStyle {
 
 @Composable
 fun StyledProgressIndicator(modifier: Modifier = Modifier) {
+    // Box needs to be wrapped around the other box to center the progress indicator
+    // while not causing the refresh shade to span the entire screen
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(top = 16.dp)
-            .size(ProgressStyle.size + ProgressStyle.padding * 2)
-            .background(
-                color = ProgressStyle.backgroundColor,
-                shape = ProgressStyle.shape
-            ),
-        contentAlignment = Alignment.TopCenter
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(ProgressStyle.size),
-            strokeWidth = ProgressStyle.stroke,
-            color = ProgressStyle.color
-        )
+        Box(
+            modifier = modifier
+                .padding(top = 16.dp)
+                .size(ProgressStyle.size + ProgressStyle.padding * 2)
+                .background(
+                    color = ProgressStyle.backgroundColor,
+                    shape = ProgressStyle.shape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(ProgressStyle.size),
+                strokeWidth = ProgressStyle.stroke,
+                color = ProgressStyle.color
+            )
+        }
     }
 }
 
