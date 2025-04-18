@@ -1,5 +1,6 @@
 package com.sreimler.currencyconverter.rates.presentation
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -8,10 +9,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -25,7 +29,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,7 +48,6 @@ import com.sreimler.currencyconverter.core.presentation.theme.StyledProgressIndi
 import com.sreimler.currencyconverter.core.presentation.util.toFormattedUiString
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -136,7 +142,7 @@ fun RatesList(
                 fontSize = 12.sp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp)
+                    .padding(top = 16.dp, bottom = 8.dp)
             )
         }
     }
@@ -148,30 +154,44 @@ fun CurrencyCard(
     exchangeRate: ExchangeRateUi,
     onItemClicked: (CurrencyUi) -> Unit
 ) {
-    Row(
-        modifier = Modifier.clickable {
-            Timber.d("Clicked on ${currency.name} in composable")
-            onItemClicked(currency)
-        },
-        verticalAlignment = Alignment.CenterVertically
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp, horizontal = 8.dp)
+            .clickable { onItemClicked(currency) },
+        tonalElevation = 4.dp,
+        shadowElevation = 2.dp,
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
     ) {
-        Image(
-            painter = painterResource(id = currency.flagRes),
-            contentDescription = currency.name
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(text = currency.name, modifier = Modifier.weight(1f))
-        Timber.d(
-            "Currency: ${currency.name}, Decimal Digits: ${currency.decimalDigits} Rate: ${exchangeRate.rate}, Formatted: ${
-                exchangeRate.rate.toFormattedUiString(
-                    currency.decimalDigits
-                )
-            }"
-        )
-        Text(
-            text = "${currency.symbolNative} ${exchangeRate.rate.toFormattedUiString(currency.decimalDigits)}",
-            textAlign = TextAlign.End
-        )
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = currency.flagRes),
+                contentDescription = currency.name,
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = currency.name,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = "${currency.symbolNative} ${exchangeRate.rate.toFormattedUiString(currency.decimalDigits)}",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
+                textAlign = TextAlign.End
+            )
+        }
     }
 }
 
