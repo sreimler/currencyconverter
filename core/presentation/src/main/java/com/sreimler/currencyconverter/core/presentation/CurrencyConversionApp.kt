@@ -40,7 +40,7 @@ fun CurrencyConversionApp(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            CurrencyConversionScaffold(navController, content = content)
+            CurrencyConversionScaffold(navController = navController, content = content)
         }
     }
 }
@@ -71,7 +71,7 @@ fun CurrencyConversionScaffold(
                 onNavigate = { route ->
                     navController.navigate(route) {
                         popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+                            inclusive = true
                         }
                         launchSingleTop = true
                         restoreState = true

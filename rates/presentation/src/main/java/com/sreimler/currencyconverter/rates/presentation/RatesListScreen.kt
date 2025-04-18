@@ -1,6 +1,7 @@
 package com.sreimler.currencyconverter.rates.presentation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -34,6 +37,7 @@ import com.sreimler.currencyconverter.core.presentation.models.ExchangeRateUi
 import com.sreimler.currencyconverter.core.presentation.models.toCurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.toExchangeRateUi
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
+import com.sreimler.currencyconverter.core.presentation.theme.StyledProgressIndicator
 import com.sreimler.currencyconverter.core.presentation.util.toFormattedUiString
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.koinViewModel
@@ -48,25 +52,49 @@ private val dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.ME
 @Composable
 fun RatesListScreenRoot(
     modifier: Modifier = Modifier,
-    viewModel: RatesViewModel = koinViewModel()
+    viewModel: RatesViewModel = koinViewModel(),
+    onNavigate: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+
+    val refreshState = rememberPullToRefreshState()
+    val isRefreshing = state.isRefreshing
+    val onRefresh = viewModel::updateExchangeRates
+
     PullToRefreshBox(
-        isRefreshing = state.isRefreshing,
-        onRefresh = viewModel::updateExchangeRates
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        modifier = Modifier.pullToRefresh(
+            isRefreshing = isRefreshing,
+            state = refreshState,
+            onRefresh = onRefresh
+        ),
+        indicator = {
+            if (isRefreshing) {
+                StyledProgressIndicator()
+            }
+        }
     ) {
-        RatesListScreen(state = state, modifier = modifier)
+        RatesListScreen(
+            state = state,
+            modifier = modifier,
+            onItemClicked = { currencyUi ->
+                viewModel.onCurrencyClicked(currencyUi)
+                onNavigate()
+            }
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RatesListScreen(modifier: Modifier = Modifier, state: RatesListState) {
+fun RatesListScreen(modifier: Modifier = Modifier, state: RatesListState, onItemClicked: (CurrencyUi) -> Unit) {
     Surface(modifier = modifier) {
         RatesList(
-            state.exchangeRates.collectAsState(initial = listOf()),
-            state.baseCurrency.collectAsState(initial = null),
-            state.refreshDate.collectAsState(initial = null)
+            exchangeRates = state.exchangeRates.collectAsState(initial = listOf()),
+            baseCurrency = state.baseCurrency.collectAsState(initial = null),
+            refreshDate = state.refreshDate.collectAsState(initial = null),
+            onItemClicked = onItemClicked
         )
     }
 }
@@ -75,13 +103,18 @@ fun RatesListScreen(modifier: Modifier = Modifier, state: RatesListState) {
 fun RatesList(
     exchangeRates: State<List<ExchangeRateUi>>,
     baseCurrency: State<CurrencyUi?>,
-    refreshDate: State<ZonedDateTime?>
+    refreshDate: State<ZonedDateTime?>,
+    onItemClicked: (CurrencyUi) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         val (base, list) = exchangeRates.value.partition { it.targetCurrency == baseCurrency.value }
 
         if (exchangeRates.value.isNotEmpty() && base.isNotEmpty() && refreshDate.value != null) {
-            CurrencyCard(currency = base.first().targetCurrency, exchangeRate = base.first())
+            CurrencyCard(
+                currency = base.first().targetCurrency,
+                exchangeRate = base.first(),
+                onItemClicked = onItemClicked
+            )
             LazyVerticalGrid(
                 columns = GridCells.Fixed(1),
                 modifier = Modifier.weight(1f) // Ensures the grid takes up available space
@@ -89,7 +122,11 @@ fun RatesList(
                 items(
                     items = list.sortedBy { it.targetCurrency.name },
                     key = { exchangeRate -> exchangeRate.targetCurrency.code }) { exchangeRate ->
-                    CurrencyCard(currency = exchangeRate.targetCurrency, exchangeRate = exchangeRate)
+                    CurrencyCard(
+                        currency = exchangeRate.targetCurrency,
+                        exchangeRate = exchangeRate,
+                        onItemClicked = onItemClicked
+                    )
                 }
             }
 
@@ -106,8 +143,18 @@ fun RatesList(
 }
 
 @Composable
-fun CurrencyCard(currency: CurrencyUi, exchangeRate: ExchangeRateUi) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+fun CurrencyCard(
+    currency: CurrencyUi,
+    exchangeRate: ExchangeRateUi,
+    onItemClicked: (CurrencyUi) -> Unit
+) {
+    Row(
+        modifier = Modifier.clickable {
+            Timber.d("Clicked on ${currency.name} in composable")
+            onItemClicked(currency)
+        },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Image(
             painter = painterResource(id = currency.flagRes),
             contentDescription = currency.name
@@ -144,7 +191,8 @@ fun ListScreenPreview() {
                 RatesList(
                     exchangeRates = MutableStateFlow(EXCHANGE_RATES.map { it.toExchangeRateUi() }).collectAsState(),
                     baseCurrency = MutableStateFlow(CURRENCY_USD.toCurrencyUi()).collectAsState(),
-                    refreshDate = MutableStateFlow(ZonedDateTime.now()).collectAsState()
+                    refreshDate = MutableStateFlow(ZonedDateTime.now()).collectAsState(),
+                    onItemClicked = { }
                 )
             }
         }

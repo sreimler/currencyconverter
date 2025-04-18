@@ -5,30 +5,26 @@ import androidx.lifecycle.viewModelScope
 import com.sreimler.currencyconverter.core.domain.CurrencyRepository
 import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.ExchangeRateUi
+import com.sreimler.currencyconverter.core.presentation.models.toCurrency
 import com.sreimler.currencyconverter.core.presentation.models.toCurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.toExchangeRateUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
-class ConverterViewModel(
-    private val currencyRepository: CurrencyRepository
-) : ViewModel() {
+class ConverterViewModel(private val currencyRepository: CurrencyRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(
         ConverterState(isLoading = true)
     )
     val state: StateFlow<ConverterState> = _state
 
-    init {
-        // TODO: persist source and target currency and retrieve here
-        getCurrenciesAndRates()
-    }
-
-    private fun getCurrenciesAndRates() {
+    fun refreshConversionState() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
@@ -45,13 +41,22 @@ class ConverterViewModel(
                     .map { it.map { it.toExchangeRateUi() } }
                     .first()
 
-                val targetCurrency = if (baseCurrency.code == "USD") {
-                    currencies.firstOrNull { it.code == "EUR" } ?: currencies.first()
-                } else {
-                    currencies.firstOrNull { it.code == "USD" } ?: currencies.first()
-                }
+                Timber.d(
+                    "currencyRepository.getSourceCurrency(): ${
+                        currencyRepository.getSourceCurrency().firstOrNull()
+                    }"
+                )
 
-                val exchangeRate = calculateExchangeRate(baseCurrency, targetCurrency, exchangeRates)
+                val sourceCurrency =
+                    currencyRepository.getSourceCurrency().firstOrNull()?.toCurrencyUi() ?: baseCurrency
+                val targetCurrency: CurrencyUi = currencyRepository.getTargetCurrency().firstOrNull()?.toCurrencyUi()
+                    ?: when (sourceCurrency.code) {
+                        "USD" -> currencies.firstOrNull { it.code == "EUR" } ?: currencies.first()
+                        else -> currencies.firstOrNull { it.code == "USD" } ?: currencies.first()
+                    }
+
+                Timber.d("sourceCurrency: $sourceCurrency, targetCurrency: $targetCurrency")
+                val exchangeRate = calculateExchangeRate(sourceCurrency, targetCurrency, exchangeRates)
                 val targetAmount = 1.0 * exchangeRate
 
                 _state.update {
@@ -60,7 +65,7 @@ class ConverterViewModel(
                         currencyList = currencies,
                         exchangeRateList = exchangeRates,
                         baseCurrency = baseCurrency,
-                        sourceCurrency = baseCurrency,
+                        sourceCurrency = sourceCurrency,
                         targetCurrency = targetCurrency,
                         exchangeRate = exchangeRate,
                         targetAmount = targetAmount
@@ -97,8 +102,10 @@ class ConverterViewModel(
     fun onCurrencySelected(field: AmountField, currency: CurrencyUi) {
         when (field) {
             AmountField.SOURCE -> {
-                val exchangeRate =
-                    calculateExchangeRate(currency, state.value.targetCurrency!!, state.value.exchangeRateList)
+                viewModelScope.launch {
+                    currencyRepository.setSourceCurrency(currency.toCurrency())
+                }
+                val exchangeRate = calculateExchangeRate(currency, state.value.targetCurrency)
                 _state.update {
                     it.copy(
                         sourceCurrency = currency,
@@ -109,8 +116,10 @@ class ConverterViewModel(
             }
 
             AmountField.TARGET -> {
-                val exchangeRate =
-                    calculateExchangeRate(state.value.sourceCurrency!!, currency, state.value.exchangeRateList)
+                viewModelScope.launch {
+                    currencyRepository.setTargetCurrency(currency.toCurrency())
+                }
+                val exchangeRate = calculateExchangeRate(state.value.sourceCurrency, currency)
                 _state.update {
                     it.copy(
                         targetCurrency = currency,
@@ -121,19 +130,20 @@ class ConverterViewModel(
             }
         }
     }
-}
 
-private fun calculateExchangeRate(
-    sourceCurrency: CurrencyUi,
-    targetCurrency: CurrencyUi,
-    exchangeRates: List<ExchangeRateUi>
-): Double {
-    val sourceRate = exchangeRates.find { it.targetCurrency == sourceCurrency }
-    val targetRate = exchangeRates.find { it.targetCurrency == targetCurrency }
+    private fun calculateExchangeRate(
+        sourceCurrency: CurrencyUi?,
+        targetCurrency: CurrencyUi?,
+        exchangeRates: List<ExchangeRateUi> = state.value.exchangeRateList
+    ): Double {
+        val sourceRate = exchangeRates.find { it.targetCurrency == sourceCurrency }
+        val targetRate = exchangeRates.find { it.targetCurrency == targetCurrency }
 
-    return if (sourceRate != null && targetRate != null) {
-        targetRate.rate / sourceRate.rate
-    } else {
-        0.0
+        return if (sourceRate != null && targetRate != null) {
+            Timber.d("calculating exchange rate to: ${sourceRate.rate / targetRate.rate}")
+            targetRate.rate / sourceRate.rate
+        } else {
+            0.0
+        }
     }
 }

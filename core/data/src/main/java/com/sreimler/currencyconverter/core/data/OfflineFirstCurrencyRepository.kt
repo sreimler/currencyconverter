@@ -3,9 +3,9 @@ package com.sreimler.currencyconverter.core.data
 import com.sreimler.currencyconverter.core.domain.Currency
 import com.sreimler.currencyconverter.core.domain.CurrencyRepository
 import com.sreimler.currencyconverter.core.domain.ExchangeRate
-import com.sreimler.currencyconverter.core.domain.LocalBaseCurrencyStorage
 import com.sreimler.currencyconverter.core.domain.LocalCurrencyDataSource
 import com.sreimler.currencyconverter.core.domain.LocalExchangeRateDataSource
+import com.sreimler.currencyconverter.core.domain.LocalPreferredCurrencyStorage
 import com.sreimler.currencyconverter.core.domain.RemoteCurrencyDataSource
 import com.sreimler.currencyconverter.core.domain.policy.SyncPolicy
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +26,7 @@ class OfflineFirstCurrencyRepository(
     private val localCurrencyDataSource: LocalCurrencyDataSource,
     private val localExchangeRateDataSource: LocalExchangeRateDataSource,
     private val remoteCurrencyDataSource: RemoteCurrencyDataSource,
-    private val baseCurrencyStorage: LocalBaseCurrencyStorage
+    private val dataStoreCurrencyStorage: LocalPreferredCurrencyStorage
 ) : CurrencyRepository {
 
     /**
@@ -85,6 +85,15 @@ class OfflineFirstCurrencyRepository(
     }
 
     /**
+     * Sets the base currency in the local storage.
+     *
+     * @property currency The [Currency] to set as the base currency.
+     */
+    override suspend fun setBaseCurrency(currency: Currency) {
+        dataStoreCurrencyStorage.setBaseCurrency(currency.code)
+    }
+
+    /**
      * Gets the base currency from the local storage.
      *
      * @return A [Flow] of the base [Currency].
@@ -92,7 +101,7 @@ class OfflineFirstCurrencyRepository(
     override suspend fun getBaseCurrency(): Flow<Currency> {
         Timber.d("invoked")
         return flow {
-            val baseCurrencyCode = baseCurrencyStorage.get()
+            val baseCurrencyCode = dataStoreCurrencyStorage.getBaseCurrency()
             var baseCurrency = localCurrencyDataSource.getCurrency(baseCurrencyCode).firstOrNull()
 
             if (baseCurrency != null) {
@@ -115,16 +124,74 @@ class OfflineFirstCurrencyRepository(
         }
     }
 
-    /**
-     * Sets the base currency in the local storage.
-     *
-     * @property currency The [Currency] to set as the base currency.
-     */
-    override suspend fun setBaseCurrency(currency: Currency) {
-        baseCurrencyStorage.set(currency.symbol)
+    override suspend fun setSourceCurrency(currency: Currency) {
+        dataStoreCurrencyStorage.setSourceCurrency(currency.code)
+    }
+
+    override suspend fun getSourceCurrency(): Flow<Currency?> {
+        return flow {
+            val sourceCurrencyCode = dataStoreCurrencyStorage.getSourceCurrency() ?: ""
+            if (sourceCurrencyCode == "") return@flow
+
+            var sourceCurrency = localCurrencyDataSource.getCurrency(sourceCurrencyCode).firstOrNull()
+
+            if (sourceCurrency != null) {
+                emit(sourceCurrency)
+            } else {
+                try {
+                    fetchCurrencies()
+                    sourceCurrency = localCurrencyDataSource.getCurrency(sourceCurrencyCode).first()
+                    if (sourceCurrency != null) {
+                        emit(sourceCurrency)
+                    }
+                } catch (e: IOException) {
+                    // TODO: handle network error, e.g., emit(Result.Error(e))
+                    Timber.e(e)
+                } catch (e: Error) {
+                    // TODO: handle datasource error, e.g., emit(Result.Error(e))
+                    Timber.e(e)
+                }
+            }
+        }
+    }
+
+    override suspend fun setTargetCurrency(currency: Currency) {
+        dataStoreCurrencyStorage.setTargetCurrency(currency.code)
+    }
+
+    override suspend fun getTargetCurrency(): Flow<Currency?> {
+        return flow {
+            val targetCurrencyCode = dataStoreCurrencyStorage.getTargetCurrency() ?: ""
+            if (targetCurrencyCode == "") return@flow
+
+            var targetCurrency = localCurrencyDataSource.getCurrency(targetCurrencyCode).firstOrNull()
+
+            if (targetCurrency != null) {
+                emit(targetCurrency)
+            } else {
+                try {
+                    fetchCurrencies()
+                    targetCurrency = localCurrencyDataSource.getCurrency(targetCurrencyCode).first()
+                    if (targetCurrency != null) {
+                        emit(targetCurrency)
+                    }
+                } catch (e: IOException) {
+                    // TODO: handle network error, e.g., emit(Result.Error(e))
+                    Timber.e(e)
+                } catch (e: Error) {
+                    // TODO: handle datasource error, e.g., emit(Result.Error(e))
+                    Timber.e(e)
+                }
+            }
+        }
     }
 
     override suspend fun getLastUpdateTime(): Flow<Long> {
         return localExchangeRateDataSource.getLastUpdateTime(getBaseCurrency().first())
+    }
+
+    override suspend fun getCurrency(currencyCode: String): Flow<Currency> {
+        // TODO: handle errors in case currency code cant be found
+        return localCurrencyDataSource.getCurrency(currencyCode) as Flow<Currency>
     }
 }

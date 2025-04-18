@@ -2,13 +2,14 @@ package com.sreimler.currencyconverter.rates.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sreimler.currencyconverter.core.domain.Currency
 import com.sreimler.currencyconverter.core.domain.CurrencyRepository
+import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.toCurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.toExchangeRateUi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -26,8 +27,6 @@ class RatesViewModel(private val currencyRepository: CurrencyRepository) : ViewM
     val state = _state
         .onStart { getExchangeRates() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), RatesListState())
-
-//    private val currencies = currencyRepository.getCurrencies()
 
     fun getExchangeRates() {
         viewModelScope.launch {
@@ -79,41 +78,9 @@ class RatesViewModel(private val currencyRepository: CurrencyRepository) : ViewM
         }
     }
 
-    fun amountChanged(changedAmount: String, amountCurrency: Currency) {
-        //Log.i(
-        //    CurrencyListViewModel::class.java.name, "Received new amount $changedAmount for currency " +
-        //            amountCurrency.name
-        //)
-        //try {
-        //    val newState = _state.value as CurrencyListState.Success
-        //
-        //    val userInput = changedAmount.trim().toDouble()
-        //    val sourceRate = newState.exchangeRates.find { it.targetCurrency == newState.baseCurrency }!!
-        //    val targetRate = newState.exchangeRates.find { it.targetCurrency == newState.targetCurrency }!!
-        //
-        //    if (amountCurrency == newState.baseCurrency) {
-        //        // Calculate target currency
-        //        val convertedAmount = (userInput * targetRate.rate) / sourceRate.rate
-        //
-        //        _state.update {
-        //            newState.copy(
-        //                sourceAmount = userInput,
-        //                targetAmount = convertedAmount
-        //            )
-        //        }
-        //    } else {
-        //        // Calculate source currency
-        //        val convertedAmount = (userInput * sourceRate.rate) / targetRate.rate
-        //
-        //        _state.update {
-        //            newState.copy(
-        //                sourceAmount = convertedAmount,
-        //                targetAmount = userInput
-        //            )
-        //        }
-        //    }
-        //} catch (e: NumberFormatException) {
-        //    // No valid double value
-        //}
+    fun onCurrencyClicked(currencyUi: CurrencyUi) {
+        viewModelScope.launch {
+            currencyRepository.setSourceCurrency(currencyRepository.getCurrency(currencyUi.code).first())
+        }
     }
 }

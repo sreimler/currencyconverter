@@ -8,10 +8,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.sreimler.currencyconverter.converter.presentation.converterNavigation
+import com.sreimler.currencyconverter.converter.presentation.navigation.converterNavigation
 import com.sreimler.currencyconverter.core.presentation.Screen
 import com.sreimler.currencyconverter.presentation.InfoScreen
-import com.sreimler.currencyconverter.rates.presentation.ratesNavigation
+import com.sreimler.currencyconverter.rates.presentation.navigation.ratesNavigation
 
 @Composable
 fun MainNavHost(navController: NavHostController) {
@@ -22,7 +22,7 @@ fun MainNavHost(navController: NavHostController) {
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        ratesNavigation()
+        ratesNavigation(onNavigate = { navController.navigate(Screen.Converter.route) })
         converterNavigation()
 
         // TODO: refactor into settings module

@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -26,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +47,7 @@ import com.sreimler.currencyconverter.core.domain.mock.CurrencyMock.CURRENCY_USD
 import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.toCurrencyUi
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
+import com.sreimler.currencyconverter.core.presentation.theme.StyledProgressIndicator
 import org.koin.androidx.compose.koinViewModel
 import java.text.DecimalFormat
 
@@ -57,8 +58,15 @@ fun ConverterScreenRoot(
 ) {
     val state by viewModel.state.collectAsState()
 
+    // Triggers once every time this screen is shown
+    LaunchedEffect(Unit) {
+        viewModel.refreshConversionState()
+    }
+
     if (state.isLoading) {
-        CircularProgressIndicator()
+        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            StyledProgressIndicator()
+        }
     } else {
         ConverterScreen(
             state = state,
@@ -159,6 +167,7 @@ fun CurrencyRow(
             )
         }
 
+        // TODO: add better input handling (eg select whole amount on focus)
         TextField(
             value = if (amount == 0.0) "" else DecimalFormat("0.00").format(amount),
             onValueChange = { onAmountChanged(field, it) },
