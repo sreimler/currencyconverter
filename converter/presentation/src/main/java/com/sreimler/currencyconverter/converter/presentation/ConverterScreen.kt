@@ -3,6 +3,8 @@ package com.sreimler.currencyconverter.converter.presentation
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,10 +35,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,6 +54,7 @@ import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.toCurrencyUi
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
 import com.sreimler.currencyconverter.core.presentation.theme.StyledProgressIndicator
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import java.text.DecimalFormat
 
@@ -167,32 +174,88 @@ fun CurrencyRow(
             )
         }
 
-        // TODO: add better input handling (eg select whole amount on focus)
-        TextField(
-            value = if (amount == 0.0) "" else DecimalFormat("0.00").format(amount),
-            onValueChange = { onAmountChanged(field, it) },
-            modifier = Modifier.weight(1f),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-                errorContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                errorIndicatorColor = Color.Transparent
-            ),
-            textStyle = LocalTextStyle.current.copy(
-                textAlign = TextAlign.End,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
+        AmountTextField(
+            amount = amount,
+            onAmountChanged = onAmountChanged,
+            field = field
         )
     }
 }
 
+@Composable
+fun AmountTextField(
+    amount: Double,
+    onAmountChanged: (AmountField, String) -> Unit,
+    field: AmountField,
+    modifier: Modifier = Modifier
+) {
+    // Format the amount to two decimal places, or empty string if zero
+    val formattedAmount = remember(amount) {
+        if (amount == 0.0) "" else DecimalFormat("0.00").format(amount)
+    }
+
+    // State to hold the text field value
+    var textFieldValue by remember { mutableStateOf(TextFieldValue(formattedAmount)) }
+
+    // Keep in sync when amount changes from ViewModel
+    LaunchedEffect(formattedAmount) {
+        if (textFieldValue.text != formattedAmount) {
+            textFieldValue = textFieldValue.copy(
+                text = formattedAmount
+            )
+        }
+    }
+
+    // Automatically select all text when focused
+    val interactionSource = remember { MutableInteractionSource() }
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            if (interaction is FocusInteraction.Focus) {
+                // Delay slightly to avoid blocking IME
+                delay(200)
+                // Select all text when the field gains focus
+                textFieldValue = textFieldValue.copy(
+                    selection = TextRange(0, textFieldValue.text.length)
+                )
+            }
+        }
+    }
+
+    // Request focus programmatically if needed
+    val focusRequester = remember { FocusRequester() }
+
+    TextField(
+        value = textFieldValue,
+        onValueChange = { newTextFieldValue ->
+            textFieldValue = newTextFieldValue
+            // Make sure to only call onAmountChanged when the input was modified
+            if (newTextFieldValue.text != formattedAmount) {
+                onAmountChanged(field, newTextFieldValue.text)
+            }
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester),
+        singleLine = true,
+        interactionSource = interactionSource,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            errorContainerColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            errorIndicatorColor = Color.Transparent
+        ),
+        textStyle = LocalTextStyle.current.copy(
+            textAlign = TextAlign.End,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+    )
+}
 
 @Composable
 fun CurrencyDropdown(
