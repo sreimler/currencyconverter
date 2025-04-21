@@ -4,6 +4,7 @@ import android.icu.math.MathContext.ROUND_HALF_UP
 import android.icu.text.DecimalFormat
 import java.math.BigDecimal
 
+
 private const val DEFAULT_MIN_SIGNIFICANT_DIGITS = 4
 
 /**
@@ -17,7 +18,6 @@ fun Double.toFormattedUiString(
     minDecimalPlaces: Int,
     minSignificantDigits: Int = DEFAULT_MIN_SIGNIFICANT_DIGITS,
 ): String {
-    // Check how many decimal places we need (which is based on minDecimalPlaces, minSignificantDigits and the double value)
     val intDigits = BigDecimal(this.toString()).toPlainString().split(".").first().length
     val fractionDigits = maxOf(minDecimalPlaces, minSignificantDigits - intDigits)
 

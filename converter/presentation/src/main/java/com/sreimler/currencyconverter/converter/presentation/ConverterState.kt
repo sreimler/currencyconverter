@@ -14,8 +14,3 @@ data class ConverterState(
     val targetAmount: Double = 1.0,
     val exchangeRate: Double = 0.0
 )
-
-enum class AmountField {
-    SOURCE,
-    TARGET
-}

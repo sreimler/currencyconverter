@@ -2,6 +2,7 @@ package com.sreimler.currencyconverter.converter.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sreimler.currencyconverter.converter.presentation.component.AmountField
 import com.sreimler.currencyconverter.core.domain.CurrencyRepository
 import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.ExchangeRateUi
