@@ -113,7 +113,7 @@ class ConverterViewModel(private val currencyRepository: CurrencyRepository) : V
                         exchangeRate = exchangeRate
                     )
                 }
-                onAmountChanged(AmountField.TARGET, state.value.targetAmount.toString())
+                onAmountChanged(AmountField.SOURCE, state.value.sourceAmount.toString())
             }
 
             AmountField.TARGET -> {
@@ -127,7 +127,7 @@ class ConverterViewModel(private val currencyRepository: CurrencyRepository) : V
                         exchangeRate = exchangeRate
                     )
                 }
-                onAmountChanged(AmountField.SOURCE, state.value.sourceAmount.toString())
+                onAmountChanged(AmountField.TARGET, state.value.targetAmount.toString())
             }
         }
     }
