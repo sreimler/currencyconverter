@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="select_currency">Select currency</string>
+    <string name="exchange_rate">1 %1$s = %2$s %3$s</string>
+    <string name="swap_currencies">Swap currencies</string>
 </resources>

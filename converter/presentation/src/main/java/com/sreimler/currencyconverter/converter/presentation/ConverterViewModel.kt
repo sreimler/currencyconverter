@@ -100,6 +100,22 @@ class ConverterViewModel(private val currencyRepository: CurrencyRepository) : V
         }
     }
 
+    fun onSwapCurrencies() {
+        val sourceCurrency = state.value.sourceCurrency
+        val targetCurrency = state.value.targetCurrency
+        val exchangeRate = calculateExchangeRate(targetCurrency, sourceCurrency)
+
+        _state.update {
+            it.copy(
+                sourceCurrency = targetCurrency,
+                targetCurrency = sourceCurrency,
+                exchangeRate = exchangeRate
+            )
+        }
+
+        onAmountChanged(AmountField.SOURCE, state.value.sourceAmount.toString())
+    }
+
     fun onCurrencySelected(field: AmountField, currency: CurrencyUi) {
         when (field) {
             AmountField.SOURCE -> {

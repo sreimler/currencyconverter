@@ -137,7 +137,7 @@ fun CurrencyAmountField(
         ),
         textStyle = androidx.compose.ui.text.TextStyle.Default.copy(
             textAlign = TextAlign.End,
-            fontSize = 24.sp,
+            fontSize = 28.sp,
             fontWeight = FontWeight.Bold
         )
     )
