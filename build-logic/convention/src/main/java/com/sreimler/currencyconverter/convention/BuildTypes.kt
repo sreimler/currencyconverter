@@ -22,7 +22,7 @@ internal fun Project.configureBuildTypes(
             File(rootProject.projectDir, "apikeys.properties").inputStream().use { load(it) }
         }
         // Retrieve the API key
-        val apiKey = apiProperties["API_KEY_FREECURRENCY"] as String
+        val apiKey = apiProperties["API_KEY_FREECURRENCY_BASE64"] as String
 
         when (extensionType) {
             ExtensionType.APPLICATION -> {

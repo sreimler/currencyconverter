@@ -7,15 +7,18 @@ import com.sreimler.currencyconverter.core.domain.ExchangeRate
 import com.sreimler.currencyconverter.core.domain.RemoteCurrencyDataSource
 import timber.log.Timber
 import java.time.ZonedDateTime
+import java.util.Base64
 
 
 class RetrofitRemoteDataSource(
     private val retrofitService: FreecurrencyApiService
 ) : RemoteCurrencyDataSource {
 
+    val decodedApiKey = Base64.getDecoder().decode(BuildConfig.API_KEY_FREECURRENCY).decodeToString()
+
     override suspend fun getCurrencies(): List<Currency> {
         Timber.i("invoked")
-        val response = retrofitService.getCurrencyList(BuildConfig.API_KEY_FREECURRENCY)
+        val response = retrofitService.getCurrencyList(decodedApiKey)
         Timber.i("getCurrencies() response: ${response.body()}")
 
         val currencies: MutableList<CurrencySerializable> = mutableListOf()
@@ -34,7 +37,7 @@ class RetrofitRemoteDataSource(
             it.code
         }
         val response = retrofitService.getExchangeRates(
-            BuildConfig.API_KEY_FREECURRENCY,
+            decodedApiKey,
             baseCurrency = baseCurrency.code,
             currencies = currencies
         )
