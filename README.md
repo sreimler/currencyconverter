@@ -1,49 +1,65 @@
 # 💱 Currency Converter – Android App
 
-A modern, modular, and production-style **Currency Converter app** built with Kotlin, Jetpack Compose, and a clean multi-module architecture. This project is designed as a portfolio piece to demonstrate strong Android engineering practices, testability, and UI craftsmanship.
+A modern, modular, and production-style **Currency Converter app** built with Kotlin, Jetpack
+Compose, and a clean multi-module architecture.
 
+## 📸 Screenshots
 
+<p align="center">
+  <img src="screenshots/rates_screen.png" width="35%" alt="Rates Screen"/>
+  <img src="screenshots/converter_screen.png" width="35%" alt="Converter Screen"/>
+</p>
 
 ## ✨ Features
 
-- 🌐 Real-time exchange rate conversion via a public currency API
+- 🌐 Real-time exchange rate conversion using a public currency API
+- 🔁 One-tap currency swapping with remembered preferences
+- 🔄 Pull-to-refresh and automatic staleness checking
 - 🧭 Bottom navigation with screens for Rates, Converter, and Settings
-- 🔄 Pull-to-refresh and automatic data staleness checking
-- ⚙️ Onboarding flow to select base currency on first launch
-- 📱 Jetpack Compose UI with modern Android theming
-- 📦 Modular architecture (per-feature modules and shared core)
-- 🧪 ViewModel-driven state management with clean domain layers
-- 📤 Offline-first sync policy with local caching
-
-
+- 📱 Jetpack Compose UI with dynamic layout and theming
+- 🎌 Region flags and locale-aware currency formatting
+- 💾 Offline-first sync strategy with caching and timestamp tracking
+- 🧪 ViewModel-driven state with clean separation between domain and UI
+- 📦 Modular architecture with feature-based separation (`app`, `rates`, `converter`, etc.)
 
 ## 🧰 Tech Stack
 
 - **Kotlin**, **Jetpack Compose**, **Coroutines**, **Flow**
 - **Koin** for dependency injection
-- **MVVM** architecture with unidirectional data flow
-- **Modularization** by feature and layer (`app`, `rates`, `converter`, `settings`, `core`, etc.)
-- **Room** or in-memory caching for offline-first behavior
-- **GitHub Actions** planned for CI setup
+- **MVVM** architecture + unidirectional data flow
+- **Room** (optional caching) or in-memory persistence
+- **Multi-module setup** for scalable code organization
 
+## 🚀 Status
 
+The app is **MVP complete and live** on
+the [Google Play Store](https://play.google.com/store/apps/details?id=com.sreimler.currencyconverter).
 
-## 🚧 Development Status
+Recent improvements:
 
-The app is currently under active development. Key components already implemented:
+- ✅ Tap-to-convert from currency rate list
+- ✅ Custom `CurrencyAmountField` for better input control
+- ✅ Swap button for source/target currencies in converter
+- ✅ Persisted conversion state using DataStore
+- ✅ Polished layout and modernized UI
+- ✅ Published Play Store release with final styling and visuals
 
-- ✅ Navigation setup with multi-module support
-- ✅ Real data loading and currency list screen
-- ✅ Swipe-to-refresh and sync strategy
-- 🔄 Conversion logic and onboarding in progress
-- 🧪 Test coverage coming soon
+Coming later:
 
+- 🛑 Error handling with custom result class and UI surfacing
+- ⚙️ Onboarding flow (select default currency)
+- 🧪 Unit tests for error handling and sync policy
+- 📈 Charts for historical rate data
+- 🔧 CI setup with GitHub Actions
 
+## 🔐 API Key Handling
 
-## 📸 Screenshots (Coming Soon)
-
-
+This app is a portfolio MVP. API usage is limited to non-sensitive endpoints, and keys are scoped
+appropriately.  
+In a production-grade app, a secure backend proxy or runtime key protection would be implemented.
 
 ## 📃 License
 
-This project is licensed under the terms of the [MIT License](./LICENSE).
+This project is licensed under the terms of the [MIT License](./LICENSE).  
+Includes country flag assets from [FlagKit](https://github.com/madebybowtie/FlagKit) by Bowtie (MIT
+License).
