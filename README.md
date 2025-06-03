@@ -32,8 +32,12 @@ Compose, and a clean multi-module architecture.
 
 ## 🚀 Status
 
-The app is **MVP complete and live** on
-the [Google Play Store](https://play.google.com/store/apps/details?id=com.sreimler.currencyconverter).
+The app is **MVP complete and live** on Google Play:<br>
+<div align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.sreimler.currencyconverter">
+    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" width="200" alt="Download the app on Google Play">
+  </a>
+</div>
 
 Recent improvements:
 
