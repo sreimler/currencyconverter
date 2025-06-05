@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -118,7 +119,7 @@ fun ConverterScreen(
                     CurrencyRow(
                         field = AmountField.TARGET,
                         amount = state.targetAmount,
-                        currency = state.targetCurrency!!,
+                        currency = state.targetCurrency,
                         currencyList = state.currencyList,
                         onAmountChanged = onAmountChanged,
                         onCurrencySelected = onCurrencySelected
@@ -169,7 +170,7 @@ fun CurrencyDropdownElement(
     onCurrencySelected: (AmountField, CurrencyUi) -> Unit,
     field: AmountField,
 ) {
-    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+    val focusManager = LocalFocusManager.current
     var expanded by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
@@ -249,8 +250,14 @@ fun ConversionRateText(modifier: Modifier = Modifier, state: ConverterState) {
 
 @Composable
 fun SwapCurrencyFab(modifier: Modifier = Modifier, onClick: () -> Unit) {
+    val focusManager = LocalFocusManager.current
+
     FloatingActionButton(
-        onClick = onClick,
+        onClick = {
+            // Clear focus of CurrencyAmountFields to allow update of values when swapping
+            focusManager.clearFocus()
+            onClick()
+        },
         containerColor = MaterialTheme.colorScheme.secondary,
         contentColor = MaterialTheme.colorScheme.onSecondary,
         shape = CircleShape,
