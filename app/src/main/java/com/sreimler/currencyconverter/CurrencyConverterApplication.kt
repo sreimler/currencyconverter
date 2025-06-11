@@ -6,8 +6,13 @@ import com.sreimler.currencyconverter.converter.presentation.di.converterPresent
 import com.sreimler.currencyconverter.core.data.di.dataModule
 import com.sreimler.currencyconverter.core.data.di.networkModule
 import com.sreimler.currencyconverter.core.database.di.databaseModule
+import com.sreimler.currencyconverter.core.domain.LocalPreferredCurrencyStorage
 import com.sreimler.currencyconverter.di.appModule
 import com.sreimler.currencyconverter.di.viewModelModule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -48,6 +53,12 @@ class CurrencyConverterApplication : Application() {
                     converterPresentationModule
                 )
             )
+        }
+
+        val preferredCurrencyStorage = getKoin().get<LocalPreferredCurrencyStorage>()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            preferredCurrencyStorage.initialize()
         }
     }
 }

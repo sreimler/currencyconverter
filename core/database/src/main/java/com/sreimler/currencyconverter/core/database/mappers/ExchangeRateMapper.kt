@@ -8,16 +8,16 @@ import java.time.ZoneId
 
 fun ExchangeRate.toExchangeRateWithCurrencyEntity(): ExchangeRateWithCurrencyEntity {
     return ExchangeRateWithCurrencyEntity(
-        baseCurrency = baseCurrency.toCurrencyEntity(),
-        targetCurrency = targetCurrency.toCurrencyEntity(),
+        baseCurrency = rateBaseCurrency.toCurrencyEntity(),
+        targetCurrency = currency.toCurrencyEntity(),
         exchangeRateEntity = this.toExchangeRateEntity()
     )
 }
 
 fun ExchangeRateWithCurrencyEntity.toExchangeRate(): ExchangeRate {
     return ExchangeRate(
-        baseCurrency = baseCurrency.toCurrency(),
-        targetCurrency = targetCurrency.toCurrency(),
+        rateBaseCurrency = baseCurrency.toCurrency(),
+        currency = targetCurrency.toCurrency(),
         dateTimeUtc = Instant.ofEpochMilli(exchangeRateEntity.dateTimeUtc).atZone(ZoneId.of("UTC")),
         rate = exchangeRateEntity.rate
     )
@@ -25,8 +25,8 @@ fun ExchangeRateWithCurrencyEntity.toExchangeRate(): ExchangeRate {
 
 fun ExchangeRate.toExchangeRateEntity(): ExchangeRateEntity {
     return ExchangeRateEntity(
-        baseCurrencyCode = baseCurrency.code,
-        targetCurrencyCode = targetCurrency.code,
+        baseCurrencyCode = rateBaseCurrency.code,
+        targetCurrencyCode = currency.code,
         dateTimeUtc = dateTimeUtc.toInstant().toEpochMilli(),
         rate = rate
     )

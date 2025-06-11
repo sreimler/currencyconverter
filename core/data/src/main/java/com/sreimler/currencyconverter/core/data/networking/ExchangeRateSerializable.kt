@@ -22,7 +22,7 @@ data class GetExchangeRateResponse(
  */
 @Serializable
 data class ExchangeRateSerializable(
-    val currency: CurrencySerializable,
-    val baseCurrency: CurrencySerializable,
+    val currencySerializable: CurrencySerializable,
+    val rateBaseCurrencySerializable: CurrencySerializable,
     val rate: Rate
 )

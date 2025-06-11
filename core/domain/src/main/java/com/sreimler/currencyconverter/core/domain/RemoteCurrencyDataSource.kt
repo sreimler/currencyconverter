@@ -16,9 +16,9 @@ interface RemoteCurrencyDataSource {
     /**
      * Retrieves the latest exchange rates from the remote data source.
      *
-     * @property baseCurrency the base currency which the exchange rates are based on.
+     * @property requestBase the base currency which the exchange rates are based on.
      * @property enabledCurrencies the list of enabled currencies which will be retrieved.
      * @return A list containing the latest [ExchangeRate]s.
      */
-    suspend fun getExchangeRates(baseCurrency: Currency, enabledCurrencies: List<Currency>): List<ExchangeRate>
+    suspend fun getExchangeRates(requestBase: Currency, enabledCurrencies: List<Currency>): List<ExchangeRate>
 }

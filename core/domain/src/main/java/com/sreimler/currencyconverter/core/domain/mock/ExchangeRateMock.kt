@@ -6,8 +6,8 @@ import java.time.ZonedDateTime
 object ExchangeRateMock {
     val EXCHANGE_RATES = CurrencyMock.CURRENCY_LIST.map { targetCurrency ->
         ExchangeRate(
-            baseCurrency = CurrencyMock.CURRENCY_USD,
-            targetCurrency = targetCurrency,
+            rateBaseCurrency = CurrencyMock.CURRENCY_USD,
+            currency = targetCurrency,
             rate = when (targetCurrency.code) {
                 "USD" -> 1.0
                 "EUR" -> 0.85

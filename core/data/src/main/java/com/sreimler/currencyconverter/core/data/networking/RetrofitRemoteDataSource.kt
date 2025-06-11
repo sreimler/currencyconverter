@@ -29,7 +29,7 @@ class RetrofitRemoteDataSource(
     }
 
     override suspend fun getExchangeRates(
-        baseCurrency: Currency,
+        requestBaseCurrency: Currency,
         enabledCurrencies: List<Currency>
     ): List<ExchangeRate> {
         Timber.i("invoked")
@@ -38,7 +38,7 @@ class RetrofitRemoteDataSource(
         }
         val response = retrofitService.getExchangeRates(
             decodedApiKey,
-            baseCurrency = baseCurrency.code,
+            baseCurrency = requestBaseCurrency.code,
             currencies = currencies
         )
         Timber.i("getExchangeRates() response: ${response.body()}")
@@ -48,8 +48,8 @@ class RetrofitRemoteDataSource(
 
         return response.body()?.data?.mapNotNull { (code, rate) ->
             ExchangeRate(
-                baseCurrency = baseCurrency,
-                targetCurrency = enabledCurrencies.first { it.code == code },
+                rateBaseCurrency = requestBaseCurrency,
+                currency = enabledCurrencies.first { it.code == code },
                 rate = rate,
                 dateTimeUtc = dateTimeUtc
             )

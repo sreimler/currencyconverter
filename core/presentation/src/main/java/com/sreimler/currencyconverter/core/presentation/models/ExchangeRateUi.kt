@@ -11,8 +11,8 @@ data class ExchangeRateUi(
 
 fun ExchangeRate.toExchangeRateUi(): ExchangeRateUi {
     return ExchangeRateUi(
-        targetCurrency = targetCurrency.toCurrencyUi(),
-        baseCurrency = baseCurrency.toCurrencyUi(),
+        targetCurrency = currency.toCurrencyUi(),
+        baseCurrency = rateBaseCurrency.toCurrencyUi(),
         rate = rate,
         dateTimeUtc = dateTimeUtc.toString()
     )

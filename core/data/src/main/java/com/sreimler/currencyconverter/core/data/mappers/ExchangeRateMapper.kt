@@ -6,16 +6,16 @@ import java.time.ZonedDateTime
 
 fun ExchangeRate.toExchangeRateSerializable(): ExchangeRateSerializable {
     return ExchangeRateSerializable(
-        currency = targetCurrency.toCurrencySerializable(),
-        baseCurrency = baseCurrency.toCurrencySerializable(),
+        currencySerializable = currency.toCurrencySerializable(),
+        rateBaseCurrencySerializable = rateBaseCurrency.toCurrencySerializable(),
         rate = rate,
     )
 }
 
 fun ExchangeRateSerializable.toExchangeRate(): ExchangeRate {
     return ExchangeRate(
-        targetCurrency = currency.toCurrency(),
-        baseCurrency = baseCurrency.toCurrency(),
+        currency = currencySerializable.toCurrency(),
+        rateBaseCurrency = rateBaseCurrencySerializable.toCurrency(),
         rate = rate,
         dateTimeUtc = ZonedDateTime.now()
     )

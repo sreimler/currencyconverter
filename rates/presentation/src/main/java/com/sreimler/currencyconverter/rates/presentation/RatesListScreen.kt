@@ -76,6 +76,9 @@ fun RatesListScreenRoot(
             onItemClicked = { currencyUi ->
                 viewModel.onCurrencyClicked(currencyUi)
                 onNavigate()
+            },
+            onItemLongClicked = { currencyUi ->
+                viewModel.onCurrencyLongClicked(currencyUi)
             }
         )
     }
@@ -83,13 +86,19 @@ fun RatesListScreenRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RatesListScreen(modifier: Modifier = Modifier, state: RatesListState, onItemClicked: (CurrencyUi) -> Unit) {
+fun RatesListScreen(
+    modifier: Modifier = Modifier,
+    state: RatesListState,
+    onItemClicked: (CurrencyUi) -> Unit,
+    onItemLongClicked: (CurrencyUi) -> Unit
+) {
     Surface(modifier = modifier) {
         RatesList(
             exchangeRates = state.exchangeRates.collectAsState(initial = listOf()),
             baseCurrency = state.baseCurrency.collectAsState(initial = null),
             refreshDate = state.refreshDate.collectAsState(initial = null),
-            onItemClicked = onItemClicked
+            onItemClicked = onItemClicked,
+            onItemLongClicked = onItemLongClicked
         )
     }
 }
@@ -99,7 +108,8 @@ fun RatesList(
     exchangeRates: State<List<ExchangeRateUi>>,
     baseCurrency: State<CurrencyUi?>,
     refreshDate: State<ZonedDateTime?>,
-    onItemClicked: (CurrencyUi) -> Unit
+    onItemClicked: (CurrencyUi) -> Unit,
+    onItemLongClicked: (CurrencyUi) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         val (base, list) = exchangeRates.value.partition { it.targetCurrency == baseCurrency.value }
@@ -108,7 +118,8 @@ fun RatesList(
             RatesListItem(
                 currency = base.first().targetCurrency,
                 exchangeRate = base.first(),
-                onItemClicked = onItemClicked
+                onItemClicked = onItemClicked,
+                onItemLongClicked = { } // This already is the base currency, no need to change
             )
             LazyVerticalGrid(
                 columns = GridCells.Fixed(1),
@@ -120,7 +131,8 @@ fun RatesList(
                     RatesListItem(
                         currency = exchangeRate.targetCurrency,
                         exchangeRate = exchangeRate,
-                        onItemClicked = onItemClicked
+                        onItemClicked = onItemClicked,
+                        onItemLongClicked = onItemLongClicked
                     )
                 }
             }
@@ -142,9 +154,9 @@ fun RatesListItem(
     currency: CurrencyUi,
     exchangeRate: ExchangeRateUi,
     onItemClicked: (CurrencyUi) -> Unit,
-    modifier: Modifier = Modifier
+    onItemLongClicked: (CurrencyUi) -> Unit
 ) {
-    StyledCurrencyRow(onClick = { onItemClicked(currency) }) {
+    StyledCurrencyRow(onClick = { onItemClicked(currency) }, onLongClick = { onItemLongClicked(currency) }) {
         CurrencyFlagImage(currency.flagRes, currency.name)
         CurrencyName(currency.name)
         CurrencyExchangeRate(currency, exchangeRate)
@@ -190,7 +202,8 @@ fun ListScreenPreview() {
                     exchangeRates = MutableStateFlow(EXCHANGE_RATES.map { it.toExchangeRateUi() }).collectAsState(),
                     baseCurrency = MutableStateFlow(CURRENCY_USD.toCurrencyUi()).collectAsState(),
                     refreshDate = MutableStateFlow(ZonedDateTime.now()).collectAsState(),
-                    onItemClicked = { }
+                    onItemClicked = { },
+                    onItemLongClicked = { }
                 )
             }
         }
