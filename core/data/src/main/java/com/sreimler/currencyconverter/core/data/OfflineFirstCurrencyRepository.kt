@@ -36,9 +36,15 @@ class OfflineFirstCurrencyRepository(
     /**
      * Gets the currencies from the local data source.
      */
-    override fun getCurrencies(): Flow<List<Currency>> {
+    override fun getCurrencies(): Flow<List<Currency>> = flow {
+        val localCurrencies = localCurrencyDataSource.getCurrencies().first()
+        if (localCurrencies.isEmpty()) {
+            fetchCurrencies()
+            emit(localCurrencyDataSource.getCurrencies().first())
+        } else {
+            emit(localCurrencies)
+        }
         Timber.d("invoked")
-        return localCurrencyDataSource.getCurrencies()
     }
 
     /**
@@ -105,6 +111,7 @@ class OfflineFirstCurrencyRepository(
      * @return A [Flow] of the base [Currency].
      */
     override suspend fun getBaseCurrency(): Flow<Currency> {
+        Timber.d("invoked")
         return dataStoreCurrencyStorage.getBaseCurrencyCode().flatMapLatest { code ->
             localCurrencyDataSource.getCurrency(code).filterNotNull()
         }
@@ -115,6 +122,7 @@ class OfflineFirstCurrencyRepository(
     }
 
     override suspend fun getSourceCurrency(): Flow<Currency?> {
+        Timber.d("invoked")
         return flow {
             val sourceCurrencyCode = dataStoreCurrencyStorage.getConversionSourceCurrency() ?: ""
             if (sourceCurrencyCode == "") return@flow
@@ -178,6 +186,12 @@ class OfflineFirstCurrencyRepository(
     }
 
     override suspend fun getCurrency(currencyCode: String): Flow<Currency> {
+        Timber.d("invoked")
+        val currency = localCurrencyDataSource.getCurrency(currencyCode).first()
+        if (currency == null) {
+            Timber.i("no currencies available - fetching from remote")
+            fetchCurrencies()
+        }
         return localCurrencyDataSource.getCurrency(currencyCode).filterNotNull()
     }
 }

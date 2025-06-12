@@ -35,7 +35,7 @@ class RatesViewModel(private val currencyRepository: CurrencyRepository) : ViewM
         viewModelScope.launch {
             try {
                 _state.update { it.copy(isRefreshing = true) }
-
+                Timber.i("getting them base currencies")
                 val baseCurrency = currencyRepository.getBaseCurrency().map { currency ->
                     currency.toCurrencyUi()
                 }
@@ -44,6 +44,11 @@ class RatesViewModel(private val currencyRepository: CurrencyRepository) : ViewM
                     .flatMapLatest { baseCurrency ->
                         val ratesFlow = currencyRepository.getLatestExchangeRates()
                         val rateList = ratesFlow.first()
+                        var currencies = mutableListOf<String>()
+                        rateList.map {
+                            currencies.add("\"${it.currency.code}\"")
+                        }
+                        Timber.i("Currencies: $currencies")
                         val requestBase = rateList[0].rateBaseCurrency
                         Timber.d("Updating rate list - base currency ${baseCurrency.code}, request base was ${requestBase.code}")
                         if (requestBase != baseCurrency) {

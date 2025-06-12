@@ -9,6 +9,7 @@ import com.sreimler.currencyconverter.core.database.di.databaseModule
 import com.sreimler.currencyconverter.core.domain.LocalPreferredCurrencyStorage
 import com.sreimler.currencyconverter.di.appModule
 import com.sreimler.currencyconverter.di.viewModelModule
+import com.sreimler.currencyconverter.startup.initializePreferredCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,10 +56,10 @@ class CurrencyConverterApplication : Application() {
             )
         }
 
-        val preferredCurrencyStorage = getKoin().get<LocalPreferredCurrencyStorage>()
-
+        // Try to identify and set base currency depending on the device locale
         CoroutineScope(Dispatchers.IO).launch {
-            preferredCurrencyStorage.initialize()
+            val currencyStorage = getKoin().get<LocalPreferredCurrencyStorage>()
+            initializePreferredCurrency(currencyStorage)
         }
     }
 }

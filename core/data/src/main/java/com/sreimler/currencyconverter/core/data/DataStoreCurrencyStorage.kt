@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.sreimler.currencyconverter.core.data.config.SupportedCurrencies.DEFAULT_BASE_CURRENCY
 import com.sreimler.currencyconverter.core.domain.LocalPreferredCurrencyStorage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -18,10 +19,11 @@ class DataStoreCurrencyStorage(
     /**
      * Initializes the datastore with the default value for the base currency
      */
-    override suspend fun initialize() {
+    override suspend fun initialize(baseCurrenyCode: String) {
         val baseCurrency = dataStore.data.map { it[KEY_BASE_CURRENCY] }.firstOrNull()
         if (baseCurrency == null) {
-            dataStore.edit { it[KEY_BASE_CURRENCY] = DEFAULT_BASE_CURRENCY }
+
+            dataStore.edit { it[KEY_BASE_CURRENCY] = baseCurrenyCode }
         }
     }
 
@@ -63,7 +65,6 @@ class DataStoreCurrencyStorage(
     }
 
     companion object {
-        private const val DEFAULT_BASE_CURRENCY = "USD"
         private val KEY_BASE_CURRENCY = stringPreferencesKey("KEY_BASE_CURRENCY")
         private val KEY_SOURCE_CURRENCY = stringPreferencesKey("KEY_SOURCE_CURRENCY")
         private val KEY_TARGET_CURRENCY = stringPreferencesKey("KEY_TARGET_CURRENCY")
