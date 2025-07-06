@@ -9,6 +9,20 @@ import kotlinx.coroutines.flow.Flow
 interface LocalCurrencyDataSource {
 
     /**
+     * Retrieves all available [Currency]s from the local data source.
+     *
+     * @return A [Flow] of a list of [Currency]s.
+     */
+    fun getCurrencies(): Flow<List<Currency>>
+
+    /**
+     * Retrieves a single [Currency] by its [code] from the local data source.
+     *
+     * @return A [Flow] of nullable [Currency].
+     */
+    fun getCurrency(code: String): Flow<Currency?>
+
+    /**
      * Upserts a [Currency] in the local data source.
      *
      * @property currency The [Currency] to upsert.
@@ -23,20 +37,6 @@ interface LocalCurrencyDataSource {
     suspend fun upsertCurrencies(currencies: List<Currency>)
 
     /**
-     * Retrieves all available [Currency]s from the local data source.
-     *
-     * @return A [Flow] of a list of [Currency]s.
-     */
-    fun getCurrencies(): Flow<List<Currency>>
-
-    /**
-     * Retrieves a single [Currency] by its [code] from the local data source.
-     *
-     * @return A [Flow] of nullable [Currency].
-     */
-    suspend fun getCurrency(code: String): Flow<Currency?>
-
-    /**
      * Deletes a [Currency] by its [code] from the local data source.
      *
      * @property code The [Currency] code to delete.
@@ -47,12 +47,4 @@ interface LocalCurrencyDataSource {
      * Deletes all [Currency]s from the local data source.
      */
     suspend fun deleteAllCurrencies()
-
-    /**
-     * Sets the [isEnabled] parameter for a [Currency] in the local data source.
-     *
-     * @property currency The [Currency] to update.
-     * @property isEnabled The new [isEnabled] value.
-     */
-    suspend fun setEnabled(currency: Currency, isEnabled: Boolean)
 }

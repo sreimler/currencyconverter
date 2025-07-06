@@ -16,10 +16,10 @@ interface CurrencyDao {
     suspend fun upsertCurrencies(currencies: List<CurrencyEntity>)
 
     @Query("SELECT * FROM currency ORDER BY code")
-    fun getCurrencies(): Flow<List<CurrencyEntity>>
+    fun observeCurrencies(): Flow<List<CurrencyEntity>>
 
     @Query("SELECT * FROM currency WHERE code = :code")
-    fun getCurrency(code: String): Flow<CurrencyEntity?>
+    fun observeCurrency(code: String): Flow<CurrencyEntity?>
 
     @Query("DELETE FROM currency WHERE code = :code")
     suspend fun deleteCurrency(code: String)

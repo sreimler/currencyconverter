@@ -12,29 +12,42 @@ import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
 
+/**
+ * Implementation of `LocalPreferredCurrencyStorage` using Android's Preferences DataStore.
+ * Provides methods to store and retrieve currency-related preferences.
+ *
+ * @property dataStore The DataStore instance used for storing preferences.
+ */
 class DataStoreCurrencyStorage(
     private val dataStore: DataStore<Preferences>
 ) : LocalPreferredCurrencyStorage {
 
-    /**
-     * Initializes the datastore with the default value for the base currency
-     */
     override suspend fun initialize(baseCurrenyCode: String) {
         val baseCurrency = dataStore.data.map { it[KEY_BASE_CURRENCY] }.firstOrNull()
         if (baseCurrency == null) {
-
-            dataStore.edit { it[KEY_BASE_CURRENCY] = baseCurrenyCode }
+            setBaseCurrencyCode(baseCurrenyCode)
         }
     }
 
-    /**
-     * Stores the symbol of the base currency (e.g. USD) in Preferences DataStore
-     */
+
+    override fun getBaseCurrencyCode(): Flow<String> {
+        return dataStore.data.map { preferences -> preferences[KEY_BASE_CURRENCY] ?: DEFAULT_BASE_CURRENCY }
+    }
+
+    override fun getConversionSourceCurrency(): Flow<String?> {
+        return dataStore.data.map { preferences -> preferences[KEY_SOURCE_CURRENCY] }
+    }
+
+    override fun getConversionTargetCurrency(): Flow<String?> {
+        return dataStore.data.map { preferences -> preferences[KEY_TARGET_CURRENCY] }
+    }
+
     override suspend fun setBaseCurrencyCode(currencyCode: String) {
         dataStore.edit { preferences ->
             preferences[KEY_BASE_CURRENCY] = currencyCode
         }
     }
+
 
     override suspend fun setConversionSourceCurrency(currencyCode: String) {
         dataStore.edit { preferences ->
@@ -47,21 +60,6 @@ class DataStoreCurrencyStorage(
         dataStore.edit { preferences ->
             preferences[KEY_TARGET_CURRENCY] = currencyCode
         }
-    }
-
-    /**
-     * Retrieves the symbol of the base currency (e.g. USD) from Preferences DataStore
-     */
-    override suspend fun getBaseCurrencyCode(): Flow<String> {
-        return dataStore.data.map { preferences -> preferences[KEY_BASE_CURRENCY] ?: DEFAULT_BASE_CURRENCY }
-    }
-
-    override suspend fun getConversionSourceCurrency(): String? {
-        return dataStore.data.firstOrNull()?.get(KEY_SOURCE_CURRENCY)
-    }
-
-    override suspend fun getConversionTargetCurrency(): String? {
-        return dataStore.data.firstOrNull()?.get(KEY_TARGET_CURRENCY)
     }
 
     companion object {

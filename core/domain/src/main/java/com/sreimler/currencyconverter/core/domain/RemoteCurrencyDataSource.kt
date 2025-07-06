@@ -1,5 +1,7 @@
 package com.sreimler.currencyconverter.core.domain
 
+import com.sreimler.currencyconverter.core.domain.util.AppResult
+
 
 /**
  * Remote data source for currencies and exchange rates.
@@ -11,7 +13,7 @@ interface RemoteCurrencyDataSource {
      *
      * @return A list of available [Currency]s.
      */
-    suspend fun getCurrencies(): List<Currency>
+    suspend fun getCurrencies(): AppResult<List<Currency>>
 
     /**
      * Retrieves the latest exchange rates from the remote data source.
@@ -20,5 +22,8 @@ interface RemoteCurrencyDataSource {
      * @property enabledCurrencies the list of enabled currencies which will be retrieved.
      * @return A list containing the latest [ExchangeRate]s.
      */
-    suspend fun getExchangeRates(requestBase: Currency, enabledCurrencies: List<Currency>): List<ExchangeRate>
+    suspend fun getExchangeRates(
+        requestBase: Currency,
+        enabledCurrencies: List<Currency>
+    ): AppResult<List<ExchangeRate>>
 }

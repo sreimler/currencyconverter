@@ -12,6 +12,19 @@ import timber.log.Timber
 
 class RoomLocalCurrencyDataSource(private val currencyDao: CurrencyDao) : LocalCurrencyDataSource {
 
+    override fun getCurrencies(): Flow<List<Currency>> {
+        return currencyDao.observeCurrencies().map { entities ->
+            entities.map { it.toCurrency() }
+        }
+    }
+
+    override fun getCurrency(code: String): Flow<Currency?> {
+        Timber.v("Getting currency for $code")
+        return currencyDao.observeCurrency(code).map { cur ->
+            cur?.toCurrency()
+        }
+    }
+
     override suspend fun upsertCurrency(currency: Currency) {
         currencyDao.upsertCurrency(currency.toCurrencyEntity())
     }
@@ -20,28 +33,11 @@ class RoomLocalCurrencyDataSource(private val currencyDao: CurrencyDao) : LocalC
         currencyDao.upsertCurrencies(currencies.map { it.toCurrencyEntity() })
     }
 
-    override fun getCurrencies(): Flow<List<Currency>> {
-        return currencyDao.getCurrencies().map { entities ->
-            entities.map { it.toCurrency() }
-        }
-    }
-
-    override suspend fun getCurrency(code: String): Flow<Currency?> {
-        Timber.v("Getting currency for $code")
-        return currencyDao.getCurrency(code).map { cur ->
-            cur?.toCurrency()
-        }
-    }
-
     override suspend fun deleteCurrency(code: String) {
         currencyDao.deleteCurrency(code)
     }
 
     override suspend fun deleteAllCurrencies() {
         currencyDao.deleteAllCurrencies()
-    }
-
-    override suspend fun setEnabled(currency: Currency, isEnabled: Boolean) {
-        currencyDao.upsertCurrency(currency.copy(isEnabled = isEnabled).toCurrencyEntity())
     }
 }

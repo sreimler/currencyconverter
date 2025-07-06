@@ -11,37 +11,36 @@ import kotlinx.coroutines.flow.map
 
 class RoomLocalExchangeRateDataSource(private val exchangeRateDao: ExchangeRateDao) : LocalExchangeRateDataSource {
 
+    override fun getAllExchangeRates(): Flow<List<ExchangeRate>> {
+        return exchangeRateDao.observeAllExchangeRates().map { entities ->
+            entities.map { it.toExchangeRate() }
+        }
+    }
+
+    override fun getLatestExchangeRates(): Flow<List<ExchangeRate>> {
+        return exchangeRateDao.observeLatestExchangeRates().map { entities ->
+            entities.map { it.toExchangeRate() }
+        }
+    }
+
+    override fun getLatestExchangeRate(targetCurrency: Currency): Flow<ExchangeRate> {
+        return exchangeRateDao.observeLatestExchangeRate(targetCurrency.code)
+            .map { it.toExchangeRate() }
+    }
+
+    override fun getLastUpdateTime(baseCurrency: Currency): Flow<Long> {
+        return exchangeRateDao.observeLatestExchangeRates()
+            .map { entities ->
+                entities.maxByOrNull { it.exchangeRateEntity.dateTimeUtc }?.exchangeRateEntity?.dateTimeUtc ?: 0L
+            }
+    }
+
     override suspend fun insertExchangeRate(exchangeRate: ExchangeRate) {
         exchangeRateDao.insertExchangeRate(exchangeRate.toExchangeRateEntity())
     }
 
     override suspend fun insertExchangeRates(exchangeRates: List<ExchangeRate>) {
         exchangeRateDao.insertExchangeRates(exchangeRates.map { it.toExchangeRateEntity() })
-    }
-
-    override fun getAllExchangeRates(): Flow<List<ExchangeRate>> {
-        return exchangeRateDao.getExchangeRatesWithCurrencies().map { entities ->
-            entities.map { it.toExchangeRate() }
-        }
-    }
-
-    override fun getLatestExchangeRates(baseCurrency: Currency): Flow<List<ExchangeRate>> {
-        return exchangeRateDao.getLatestExchangeRatesWithCurrencies(baseCurrency.code).map { entities ->
-            entities.map { it.toExchangeRate() }
-        }
-    }
-
-    override fun getLatestExchangeRate(baseCurrency: Currency, targetCurrency: Currency): Flow<ExchangeRate> {
-        return exchangeRateDao.getLatestExchangeRate(baseCurrency.code, targetCurrency.code)
-            .map { it.toExchangeRate() }
-    }
-
-    override fun getLastUpdateTime(baseCurrency: Currency): Flow<Long> {
-        return exchangeRateDao.getLatestExchangeRatesWithCurrencies(baseCurrency.code)
-            .map { entities ->
-                entities.maxByOrNull { it.exchangeRateEntity.dateTimeUtc }?.exchangeRateEntity?.dateTimeUtc
-                    ?: 0L
-            }
     }
 
     override suspend fun deleteAllExchangeRates() {

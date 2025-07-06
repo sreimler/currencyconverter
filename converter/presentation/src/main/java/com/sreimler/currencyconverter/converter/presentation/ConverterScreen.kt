@@ -1,5 +1,6 @@
 package com.sreimler.currencyconverter.converter.presentation
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,13 +25,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sreimler.currencyconverter.converter.presentation.component.AmountField
 import com.sreimler.currencyconverter.converter.presentation.component.CurrencyAmountField
 import com.sreimler.currencyconverter.core.domain.mock.CurrencyMock.CURRENCY_EUR
@@ -51,6 +53,7 @@ import com.sreimler.currencyconverter.core.presentation.models.toCurrencyUi
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
 import com.sreimler.currencyconverter.core.presentation.theme.StyledProgressIndicator
 import com.sreimler.currencyconverter.core.presentation.util.toFormattedUiString
+import com.sreimler.currencyconverter.core.presentation.util.toString
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -59,11 +62,14 @@ fun ConverterScreenRoot(
     modifier: Modifier = Modifier,
     viewModel: ConverterViewModel = koinViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    // Triggers once every time this screen is shown
-    LaunchedEffect(Unit) {
-        viewModel.refreshConversionState()
+    // Display viewmodel errors as toasts
+    val context = LocalContext.current
+    LaunchedEffect(true) {
+        viewModel.errors.collect { error ->
+            Toast.makeText(context, error.toString(context), Toast.LENGTH_SHORT).show()
+        }
     }
 
     if (state.isLoading) {

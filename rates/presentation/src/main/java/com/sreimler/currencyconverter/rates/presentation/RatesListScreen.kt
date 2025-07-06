@@ -1,5 +1,14 @@
+@file:OptIn(ExperimentalAnimationApi::class)
+
 package com.sreimler.currencyconverter.rates.presentation
 
+import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,15 +24,16 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sreimler.currencyconverter.core.domain.mock.CurrencyMock.CURRENCY_USD
 import com.sreimler.currencyconverter.core.domain.mock.ExchangeRateMock.EXCHANGE_RATES
 import com.sreimler.currencyconverter.core.presentation.component.CurrencyFlagImage
@@ -35,7 +45,7 @@ import com.sreimler.currencyconverter.core.presentation.models.toExchangeRateUi
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
 import com.sreimler.currencyconverter.core.presentation.theme.StyledProgressIndicator
 import com.sreimler.currencyconverter.core.presentation.util.toFormattedUiString
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.sreimler.currencyconverter.core.presentation.util.toString
 import org.koin.androidx.compose.koinViewModel
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -47,10 +57,18 @@ private val dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.ME
 @Composable
 fun RatesListScreenRoot(
     modifier: Modifier = Modifier,
-    viewModel: RatesViewModel = koinViewModel(),
+    viewModel: RatesListViewModel = koinViewModel(),
     onNavigate: () -> Unit
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    // Display viewmodel errors as toasts
+    val context = LocalContext.current
+    LaunchedEffect(true) {
+        viewModel.errors.collect { error ->
+            Toast.makeText(context, error.toString(context), Toast.LENGTH_SHORT).show()
+        }
+    }
 
     val refreshState = rememberPullToRefreshState()
     val isRefreshing = state.isRefreshing
@@ -94,9 +112,9 @@ fun RatesListScreen(
 ) {
     Surface(modifier = modifier) {
         RatesList(
-            exchangeRates = state.exchangeRates.collectAsState(initial = listOf()),
-            baseCurrency = state.baseCurrency.collectAsState(initial = null),
-            refreshDate = state.refreshDate.collectAsState(initial = null),
+            exchangeRates = state.exchangeRates,
+            baseCurrency = state.baseCurrency,
+            refreshDate = state.refreshDate,
             onItemClicked = onItemClicked,
             onItemLongClicked = onItemLongClicked
         )
@@ -105,46 +123,54 @@ fun RatesListScreen(
 
 @Composable
 fun RatesList(
-    exchangeRates: State<List<ExchangeRateUi>>,
-    baseCurrency: State<CurrencyUi?>,
-    refreshDate: State<ZonedDateTime?>,
+    exchangeRates: List<ExchangeRateUi>,
+    baseCurrency: CurrencyUi?,
+    refreshDate: ZonedDateTime?,
     onItemClicked: (CurrencyUi) -> Unit,
     onItemLongClicked: (CurrencyUi) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        val (base, list) = exchangeRates.value.partition { it.targetCurrency == baseCurrency.value }
+    // Smoothen the transition when changing the base currency
+    AnimatedContent(
+        targetState = baseCurrency,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(durationMillis = 1500)) togetherWith fadeOut()
+        }
+    ) { currentBaseCurrency ->
+        Column(modifier = Modifier.fillMaxSize()) {
+            val (base, list) = exchangeRates.partition { it.targetCurrency == currentBaseCurrency }
 
-        if (exchangeRates.value.isNotEmpty() && base.isNotEmpty() && refreshDate.value != null) {
-            RatesListItem(
-                currency = base.first().targetCurrency,
-                exchangeRate = base.first(),
-                onItemClicked = onItemClicked,
-                onItemLongClicked = { } // This already is the base currency, no need to change
-            )
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(1),
-                modifier = Modifier.weight(1f) // Ensures the grid takes up available space
-            ) {
-                items(
-                    items = list.sortedBy { it.targetCurrency.name },
-                    key = { exchangeRate -> exchangeRate.targetCurrency.code }) { exchangeRate ->
-                    RatesListItem(
-                        currency = exchangeRate.targetCurrency,
-                        exchangeRate = exchangeRate,
-                        onItemClicked = onItemClicked,
-                        onItemLongClicked = onItemLongClicked
-                    )
+            if (exchangeRates.isNotEmpty() && base.isNotEmpty() && refreshDate != null) {
+                RatesListItem(
+                    currency = base.first().targetCurrency,
+                    exchangeRate = base.first(),
+                    onItemClicked = onItemClicked,
+                    onItemLongClicked = { } // This already is the base currency, no need to change
+                )
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(1),
+                    modifier = Modifier.weight(1f) // Ensures the grid takes up available space
+                ) {
+                    items(
+                        items = list.sortedBy { it.targetCurrency.name },
+                        key = { exchangeRate -> exchangeRate.targetCurrency.code }) { exchangeRate ->
+                        RatesListItem(
+                            currency = exchangeRate.targetCurrency,
+                            exchangeRate = exchangeRate,
+                            onItemClicked = onItemClicked,
+                            onItemLongClicked = onItemLongClicked
+                        )
+                    }
                 }
-            }
 
-            Text(
-                text = "Last update: ${dateFormatter.format(refreshDate.value)}",
-                textAlign = TextAlign.Center,
-                fontSize = 12.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 8.dp)
-            )
+                Text(
+                    text = "Last update: ${dateFormatter.format(refreshDate)}",
+                    textAlign = TextAlign.Center,
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 8.dp)
+                )
+            }
         }
     }
 }
@@ -184,7 +210,6 @@ private fun CurrencyExchangeRate(currency: CurrencyUi, exchangeRate: ExchangeRat
     )
 }
 
-
 @Preview
 @Composable
 fun ListScreenPreview() {
@@ -199,9 +224,9 @@ fun ListScreenPreview() {
                     .padding(horizontal = 16.dp) // Padding applied only to content
             ) {
                 RatesList(
-                    exchangeRates = MutableStateFlow(EXCHANGE_RATES.map { it.toExchangeRateUi() }).collectAsState(),
-                    baseCurrency = MutableStateFlow(CURRENCY_USD.toCurrencyUi()).collectAsState(),
-                    refreshDate = MutableStateFlow(ZonedDateTime.now()).collectAsState(),
+                    exchangeRates = EXCHANGE_RATES.map { it.toExchangeRateUi() },
+                    baseCurrency = CURRENCY_USD.toCurrencyUi(),
+                    refreshDate = ZonedDateTime.now(),
                     onItemClicked = { },
                     onItemLongClicked = { }
                 )
