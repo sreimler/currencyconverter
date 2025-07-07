@@ -12,4 +12,5 @@
     <string name="error_too_many_requests">Too many requests. Please wait and try again.</string>
     <string name="error_unauthorized">Unauthorized access. Please check your credentials.</string>
     <string name="error_unknown">An unknown error occurred.</string>
+    <string name="refresh_interval_too_short">Refresh interval too short - retry later</string>
 </resources>

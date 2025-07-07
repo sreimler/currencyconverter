@@ -6,6 +6,7 @@ sealed class AppError {
     object NoInternet : AppError()
     object ServerError : AppError()
     object InvalidRequest : AppError()
+    object RefreshNotAllowed : AppError()
     object Serialization : AppError()
     object Unauthorized : AppError()
     object NotFound : AppError()

@@ -99,10 +99,6 @@ class OfflineFirstCurrencyRepository(
             .flatMapLatest { baseCurrencyCode ->
                 flow {
                     emit(AppResult.Loading())
-                    if (baseCurrencyCode.isBlank()) {
-                        emit(AppResult.Error(AppError.NotFound))
-                        return@flow
-                    }
                     val currency = localCurrencyDataSource.getCurrency(baseCurrencyCode).firstOrNull()
                     if (currency == null) {
                         val result = refreshCurrencies()
@@ -199,11 +195,12 @@ class OfflineFirstCurrencyRepository(
     override suspend fun refreshExchangeRates(): EmptyAppResult {
         Timber.d("invoked")
         return try {
-            val lastUpdateResult = lastUpdateTimeStream().firstOrNull()
+            val lastUpdateResult = lastUpdateTimeStream().filterNot { it is AppResult.Loading }.first()
+
             val lastUpdate = (lastUpdateResult as? AppResult.Success)?.data ?: 0L
             if (!SyncPolicy.isRefreshAllowed(lastUpdate)) {
                 Timber.w("Refresh interval too short - will not fetch from remote")
-                return AppResult.Error(AppError.InvalidRequest)
+                return AppResult.Error(AppError.RefreshNotAllowed)
             }
 
             val baseResult = baseCurrencyStream().filterNot { it is AppResult.Loading }.first()

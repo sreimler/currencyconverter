@@ -14,6 +14,7 @@ fun AppError.toString(context: Context): String {
         AppError.ServerError -> R.string.error_server                     // 5xx level server issue
         AppError.TooManyRequests -> R.string.error_too_many_requests      // API rate limit
         AppError.Unauthorized -> R.string.error_unauthorized              // missing/invalid API key
+        AppError.RefreshNotAllowed -> R.string.refresh_interval_too_short // refresh interval too short
         is AppError.Unknown -> R.string.error_unknown                     // fallback
     }
 
