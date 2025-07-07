@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.currencyconverter.android.application)
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.firebaseCrashlytics)
 }
 
 // Version information
@@ -63,18 +65,17 @@ dependencies {
 
     // Compose
     implementation(libs.androidx.material3) // TODO: Remove when settings have been refactored into a module
-//    implementation(libs.androidx.lifecycle.runtime.ktx)
-//    implementation(libs.androidx.activity.compose)
-//    implementation(libs.androidx.ui)
-//    implementation(libs.androidx.ui.graphics)
-//    implementation(libs.androidx.ui.tooling.preview)
-//    implementation(libs.androidx.material.icons.extended) // or latest
 
     // Koin DI
     implementation(libs.bundles.koin)
 
     // Preferences DataStore
     implementation(libs.androidx.datastore)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics.ndk)
+    implementation(libs.firebase.analytics)
 
     // Timber logging
     implementation(libs.timber)
