@@ -3,6 +3,7 @@ package com.sreimler.currencyconverter.core.presentation.util
 import com.sreimler.currencyconverter.core.domain.CurrencyRepository
 import com.sreimler.currencyconverter.core.domain.util.AppError
 import com.sreimler.currencyconverter.core.domain.util.AppResult
+import com.sreimler.currencyconverter.core.domain.util.ErrorLogger
 import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.ExchangeRateUi
 import com.sreimler.currencyconverter.core.presentation.models.toCurrencyUi
@@ -21,15 +22,22 @@ import timber.log.Timber
  *
  * @param currencyRepository The repository providing the base currency stream.
  * @param errors A shared flow to emit errors encountered during processing.
+ * @param errorLogger An `ErrorLogger` instance.
  * @return A flow emitting the base currency as a `CurrencyUi` object or `null` if unavailable.
  */
 fun baseCurrencyFlow(
     currencyRepository: CurrencyRepository,
-    errors: MutableSharedFlow<AppError>
+    errors: MutableSharedFlow<AppError>,
+    errorLogger: ErrorLogger
 ): Flow<CurrencyUi?> =
     currencyRepository.baseCurrencyStream()
         .onEach { Timber.d("baseCurrencyStream emitted: $it") }
-        .onEach { if (it is AppResult.Error) errors.emit(it.error) }
+        .onEach {
+            if (it is AppResult.Error) {
+                errorLogger.log(it.error)
+                errors.emit(it.error)
+            }
+        }
         .map {
             when (it) {
                 is AppResult.Success -> it.data.toCurrencyUi()
@@ -43,15 +51,22 @@ fun baseCurrencyFlow(
  *
  * @param currencyRepository The repository providing the currencies stream.
  * @param errors A shared flow to emit errors encountered during processing.
+ * @param errorLogger An `ErrorLogger` instance.
  * @return A flow emitting a list of `CurrencyUi` objects or an empty list if unavailable.
  */
 fun currenciesFlow(
     currencyRepository: CurrencyRepository,
-    errors: MutableSharedFlow<AppError>
+    errors: MutableSharedFlow<AppError>,
+    errorLogger: ErrorLogger
 ): Flow<List<CurrencyUi>> =
     currencyRepository.currenciesStream()
         .onEach { Timber.d("currenciesStream emitted: $it") }
-        .onEach { if (it is AppResult.Error) errors.emit(it.error) }
+        .onEach {
+            if (it is AppResult.Error) {
+                errorLogger.log(it.error)
+                errors.emit(it.error)
+            }
+        }
         .map {
             when (it) {
                 is AppResult.Success -> {
@@ -71,15 +86,22 @@ fun currenciesFlow(
  *
  * @param currencyRepository The repository providing the exchange rates and base currency streams.
  * @param errors A shared flow to emit errors encountered during processing.
+ * @param errorLogger An `ErrorLogger` instance.
  * @return A flow emitting a list of `ExchangeRateUi` objects or an empty list if unavailable.
  */
 fun exchangeRatesFlow(
     currencyRepository: CurrencyRepository,
-    errors: MutableSharedFlow<AppError>
+    errors: MutableSharedFlow<AppError>,
+    errorLogger: ErrorLogger
 ): Flow<List<ExchangeRateUi>> =
     currencyRepository.latestExchangeRatesStream()
         .onEach { Timber.d("exchangeRatesStream emitted: $it") }
-        .onEach { if (it is AppResult.Error) errors.emit(it.error) }
+        .onEach {
+            if (it is AppResult.Error) {
+                errorLogger.log(it.error)
+                errors.emit(it.error)
+            }
+        }
         .combine(currencyRepository.baseCurrencyStream()) { ratesResult, baseResult ->
             Timber.d("Exchange rates: $ratesResult")
             Timber.d("Base currency in combine: $baseResult")

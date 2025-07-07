@@ -4,6 +4,8 @@ import android.icu.util.Currency
 import com.sreimler.currencyconverter.core.data.config.SupportedCurrencies
 import com.sreimler.currencyconverter.core.data.config.SupportedCurrencies.DEFAULT_BASE_CURRENCY
 import com.sreimler.currencyconverter.core.domain.LocalPreferredCurrencyStorage
+import com.sreimler.currencyconverter.core.domain.util.AppError
+import com.sreimler.currencyconverter.core.domain.util.ErrorLogger
 import timber.log.Timber
 import java.util.Locale
 
@@ -13,7 +15,10 @@ import java.util.Locale
  *
  * @param currencyStorage The storage mechanism for saving the preferred currency.
  */
-suspend fun initializePreferredCurrency(currencyStorage: LocalPreferredCurrencyStorage) {
+suspend fun initializePreferredCurrency(
+    currencyStorage: LocalPreferredCurrencyStorage,
+    errorLogger: ErrorLogger
+) {
     // Retrieve the list of supported currency codes
     val supportedCurrencies = SupportedCurrencies.codes
 
@@ -25,6 +30,7 @@ suspend fun initializePreferredCurrency(currencyStorage: LocalPreferredCurrencyS
     val currency = try {
         Currency.getInstance(locale)
     } catch (e: IllegalArgumentException) {
+        errorLogger.log(AppError.Unknown(e))
         Timber.w(e, "Not country or no corresponding currency found")
         null
     }

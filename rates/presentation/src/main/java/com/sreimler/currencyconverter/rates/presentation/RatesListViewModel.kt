@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.sreimler.currencyconverter.core.domain.CurrencyRepository
 import com.sreimler.currencyconverter.core.domain.util.AppError
 import com.sreimler.currencyconverter.core.domain.util.AppResult
+import com.sreimler.currencyconverter.core.domain.util.ErrorLogger
 import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.ExchangeRateUi
 import com.sreimler.currencyconverter.core.presentation.models.toCurrency
@@ -35,9 +36,13 @@ import java.time.ZonedDateTime
  * Observes currency and exchange rate data streams and updates the UI state accordingly.
  *
  * @property currencyRepository The repository providing currency and exchange rate data.
+ * @property errorLogger An `ErrorLogger` instance.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class RatesListViewModel(private val currencyRepository: CurrencyRepository) : ViewModel() {
+class RatesListViewModel(
+    private val currencyRepository: CurrencyRepository,
+    private val errorLogger: ErrorLogger
+) : ViewModel() {
 
     // Holds the current state of the rates list screen
     private val _state = MutableStateFlow(RatesListState(isRefreshing = true))
@@ -56,13 +61,18 @@ class RatesListViewModel(private val currencyRepository: CurrencyRepository) : V
      * Updates the UI state with the combined data.
      */
     private fun observeCurrenciesAndRates() {
-        val baseCurrencyFlow: Flow<CurrencyUi?> = baseCurrencyFlow(currencyRepository, _errors)
-        val exchangeRatesFlow: Flow<List<ExchangeRateUi>> = exchangeRatesFlow(currencyRepository, _errors)
-        val currenciesFlow: Flow<List<CurrencyUi>> = currenciesFlow(currencyRepository, _errors)
+        val baseCurrencyFlow: Flow<CurrencyUi?> = baseCurrencyFlow(currencyRepository, _errors, errorLogger)
+        val exchangeRatesFlow: Flow<List<ExchangeRateUi>> = exchangeRatesFlow(currencyRepository, _errors, errorLogger)
+        val currenciesFlow: Flow<List<CurrencyUi>> = currenciesFlow(currencyRepository, _errors, errorLogger)
 
         val refreshDateFlow: Flow<ZonedDateTime?> = currencyRepository.lastUpdateTimeStream()
             .onEach { Timber.d("refreshDateStream emitted: $it") }
-            .onEach { if (it is AppResult.Error) _errors.emit(it.error) }
+            .onEach {
+                if (it is AppResult.Error) {
+                    errorLogger.log(it.error)
+                    _errors.emit(it.error)
+                }
+            }
             .mapNotNull { (it as? AppResult.Success)?.data }
             .map { millis ->
                 ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
@@ -96,6 +106,7 @@ class RatesListViewModel(private val currencyRepository: CurrencyRepository) : V
             _state.update { it.copy(isRefreshing = true) }
             val refreshResult = currencyRepository.refreshExchangeRates()
             if (refreshResult is AppResult.Error) {
+                errorLogger.log(refreshResult.error)
                 _errors.emit(refreshResult.error)
             }
             _state.update { it.copy(isRefreshing = false) }
@@ -114,7 +125,9 @@ class RatesListViewModel(private val currencyRepository: CurrencyRepository) : V
 
         viewModelScope.launch {
             if (baseCurrency == null) {
-                _errors.emit(AppError.NotFound)
+                val error = AppError.NotFound
+                errorLogger.log(error)
+                _errors.emit(error)
             } else {
                 currencyRepository.setTargetCurrency(baseCurrency.toCurrency())
                 currencyRepository.setSourceCurrency(targetCurrency.toCurrency())

@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.sreimler.currencyconverter.core.presentation.CurrencyConversionApp
 import com.sreimler.currencyconverter.navigation.MainNavHost
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

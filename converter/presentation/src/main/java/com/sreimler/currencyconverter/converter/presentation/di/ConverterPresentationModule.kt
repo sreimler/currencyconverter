@@ -5,5 +5,5 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val converterPresentationModule = module {
-    viewModel { ConverterViewModel(get()) }
+    viewModel { ConverterViewModel(get(), get()) }
 }

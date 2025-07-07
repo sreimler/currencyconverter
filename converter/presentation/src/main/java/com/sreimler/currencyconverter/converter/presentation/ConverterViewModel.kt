@@ -6,6 +6,7 @@ import com.sreimler.currencyconverter.converter.presentation.component.AmountFie
 import com.sreimler.currencyconverter.core.domain.CurrencyRepository
 import com.sreimler.currencyconverter.core.domain.util.AppError
 import com.sreimler.currencyconverter.core.domain.util.AppResult
+import com.sreimler.currencyconverter.core.domain.util.ErrorLogger
 import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.ExchangeRateUi
 import com.sreimler.currencyconverter.core.presentation.models.toCurrency
@@ -30,8 +31,12 @@ import timber.log.Timber
  * ViewModel for the currency conversion screen. Manages the state and business logic for currency conversion.
  *
  * @property currencyRepository The repository used to fetch and manage currency and exchange rate data.
+ * @property errorLogger An `ErrorLogger` instance.
  */
-class ConverterViewModel(private val currencyRepository: CurrencyRepository) : ViewModel() {
+class ConverterViewModel(
+    private val currencyRepository: CurrencyRepository,
+    private val errorLogger: ErrorLogger
+) : ViewModel() {
 
     // StateFlow to hold the current state of the converter screen
     private val _state = MutableStateFlow(
@@ -52,9 +57,9 @@ class ConverterViewModel(private val currencyRepository: CurrencyRepository) : V
      * Combines these flows and updates the state accordingly.
      */
     private fun observeCurrenciesAndRates() {
-        val baseCurrencyFlow: Flow<CurrencyUi?> = baseCurrencyFlow(currencyRepository, _errors)
-        val exchangeRatesFlow: Flow<List<ExchangeRateUi>> = exchangeRatesFlow(currencyRepository, _errors)
-        val currenciesFlow: Flow<List<CurrencyUi>> = currenciesFlow(currencyRepository, _errors)
+        val baseCurrencyFlow: Flow<CurrencyUi?> = baseCurrencyFlow(currencyRepository, _errors, errorLogger)
+        val exchangeRatesFlow: Flow<List<ExchangeRateUi>> = exchangeRatesFlow(currencyRepository, _errors, errorLogger)
+        val currenciesFlow: Flow<List<CurrencyUi>> = currenciesFlow(currencyRepository, _errors, errorLogger)
 
         combine(baseCurrencyFlow, exchangeRatesFlow, currenciesFlow) { base, rates, currencies ->
             Timber.d("Converter received updated data")
@@ -67,6 +72,7 @@ class ConverterViewModel(private val currencyRepository: CurrencyRepository) : V
                 }
 
                 is AppResult.Error -> {
+                    errorLogger.log(sourceResult.error)
                     _errors.emit(sourceResult.error)
                     return@combine
                 }
@@ -89,7 +95,7 @@ class ConverterViewModel(private val currencyRepository: CurrencyRepository) : V
                                 currencies.first { it.code == "EUR" }
                             }
                         } catch (e: NoSuchElementException) {
-                            Timber.e(e)
+                            errorLogger.log(AppError.Unknown(e)) // Log the error message to be on the safe side
                             _errors.emit(AppError.NotFound)
                             return@combine
                         }
@@ -99,7 +105,10 @@ class ConverterViewModel(private val currencyRepository: CurrencyRepository) : V
                     _state.update { it.copy(targetCurrency = targetCurrency) }
                 }
 
-                is AppResult.Error -> _errors.emit(targetResult.error)
+                is AppResult.Error -> {
+                    errorLogger.log(targetResult.error)
+                    _errors.emit(targetResult.error)
+                }
                 is AppResult.Loading -> Unit
             }
 

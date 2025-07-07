@@ -7,6 +7,7 @@ import com.sreimler.currencyconverter.core.data.di.dataModule
 import com.sreimler.currencyconverter.core.data.di.networkModule
 import com.sreimler.currencyconverter.core.database.di.databaseModule
 import com.sreimler.currencyconverter.core.domain.LocalPreferredCurrencyStorage
+import com.sreimler.currencyconverter.core.domain.util.ErrorLogger
 import com.sreimler.currencyconverter.di.appModule
 import com.sreimler.currencyconverter.di.viewModelModule
 import com.sreimler.currencyconverter.startup.initializePreferredCurrency
@@ -59,7 +60,8 @@ class CurrencyConverterApplication : Application() {
         // Try to identify and set base currency depending on the device locale
         CoroutineScope(Dispatchers.IO).launch {
             val currencyStorage = getKoin().get<LocalPreferredCurrencyStorage>()
-            initializePreferredCurrency(currencyStorage)
+            val errorLogger = getKoin().get<ErrorLogger>()
+            initializePreferredCurrency(currencyStorage, errorLogger)
         }
     }
 }
