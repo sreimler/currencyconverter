@@ -1,7 +1,6 @@
 package com.sreimler.currencyconverter
 
 import android.app.Application
-import android.util.Log
 import com.sreimler.currencyconverter.converter.presentation.di.converterPresentationModule
 import com.sreimler.currencyconverter.core.data.di.dataModule
 import com.sreimler.currencyconverter.core.data.di.networkModule
@@ -35,9 +34,7 @@ class CurrencyConverterApplication : Application() {
         } else {
             Timber.plant(object : Timber.Tree() {
                 override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-                    if (priority == Log.ERROR || priority == Log.WARN) {
-                        // TODO: send to crashlytics
-                    }
+                    // No timber logging in production - errors are logged by the ErrorLogger instance
                 }
             })
         }

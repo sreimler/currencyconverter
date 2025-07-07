@@ -32,8 +32,8 @@ material3 = "1.3.2"
 
 # Project versions
 projectMinSdkVersion = "25"
-projectTargetSdkVersion = "35"
-projectCompileSdkVersion = "35"
+projectTargetSdkVersion = "36"
+projectCompileSdkVersion = "36"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
