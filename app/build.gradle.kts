@@ -7,7 +7,7 @@ plugins {
 // Version information
 val versionMajor = 0
 val versionMinor = 9
-val versionPatch = 0
+val versionPatch = 4
 
 android {
     signingConfigs {

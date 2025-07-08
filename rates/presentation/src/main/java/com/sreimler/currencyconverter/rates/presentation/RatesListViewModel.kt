@@ -129,8 +129,8 @@ class RatesListViewModel(
                 errorLogger.log(error)
                 _errors.emit(error)
             } else {
-                currencyRepository.setTargetCurrency(baseCurrency.toCurrency())
-                currencyRepository.setSourceCurrency(targetCurrency.toCurrency())
+                currencyRepository.setSourceCurrency(baseCurrency.toCurrency())
+                currencyRepository.setTargetCurrency(targetCurrency.toCurrency())
             }
         }
     }

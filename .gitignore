@@ -185,6 +185,9 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# Ignore Kotlin 2.0 compiler session files
+*.salive
+
 ### AndroidStudio Patch ###
 
 !/gradle/wrapper/gradle-wrapper.jar

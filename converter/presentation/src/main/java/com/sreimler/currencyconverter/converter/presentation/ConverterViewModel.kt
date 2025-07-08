@@ -72,9 +72,15 @@ class ConverterViewModel(
                 }
 
                 is AppResult.Error -> {
-                    errorLogger.log(sourceResult.error)
-                    _errors.emit(sourceResult.error)
-                    return@combine
+                    if (sourceResult.error is AppError.InvalidRequest && base != null) {
+                        // Source currency not set - fall back to default (base currency)
+                        currencyRepository.setSourceCurrency(base.toCurrency())
+                        _state.update { it.copy(sourceCurrency = base) }
+                    } else {
+                        errorLogger.log(sourceResult.error)
+                        _errors.emit(sourceResult.error)
+                        return@combine
+                    }
                 }
 
                 is AppResult.Loading -> Unit
@@ -82,34 +88,39 @@ class ConverterViewModel(
 
             // Retrieve and update target currency
             val targetResult = currencyRepository.targetCurrencyStream().first { it !is AppResult.Loading }
-            when (targetResult) {
+            val fallback = getFallbackTargetCurrency(_state.value.sourceCurrency?.code, currencies)
+            val resolvedTargetCurrency = when (targetResult) {
                 is AppResult.Success -> {
                     // Check if source and target currencies are identical
-                    var targetCurrency = targetResult.data.toCurrencyUi()
-                    if (targetCurrency.code == (sourceResult as AppResult.Success).data.code) {
-                        // If so, we will fall back to USD first, then EUR second
-                        targetCurrency = try {
-                            if (targetCurrency.code != "USD") {
-                                currencies.first { it.code == "USD" }
-                            } else {
-                                currencies.first { it.code == "EUR" }
-                            }
-                        } catch (e: NoSuchElementException) {
-                            errorLogger.log(AppError.Unknown(e)) // Log the error message to be on the safe side
-                            _errors.emit(AppError.NotFound)
-                            return@combine
-                        }
-
+                    val targetCurrency = targetResult.data.toCurrencyUi()
+                    if (targetCurrency.code == _state.value.sourceCurrency?.code) {
+                        fallback
+                    } else {
+                        targetCurrency
                     }
-                    Timber.d("Retrieved target currency")
-                    _state.update { it.copy(targetCurrency = targetCurrency) }
                 }
 
                 is AppResult.Error -> {
-                    errorLogger.log(targetResult.error)
-                    _errors.emit(targetResult.error)
+                    if (targetResult.error is AppError.InvalidRequest) {
+                        // Target currency not set - fall back to default
+                        fallback
+                    } else {
+                        errorLogger.log(targetResult.error)
+                        _errors.emit(targetResult.error)
+                        return@combine
+                    }
                 }
-                is AppResult.Loading -> Unit
+
+                is AppResult.Loading -> null // Should not happen due to filtering above
+            }
+
+            if (resolvedTargetCurrency != null) {
+                _state.update { it.copy(targetCurrency = resolvedTargetCurrency) }
+                Timber.d("Retrieved target currency")
+            } else {
+                errorLogger.log(AppError.NotFound)
+                _errors.emit(AppError.NotFound)
+                return@combine
             }
 
             // Update exchange rate and state
@@ -132,7 +143,25 @@ class ConverterViewModel(
         }
             .onEach { Timber.d("Updated state with latest rate and currency information - source ${_state.value.sourceCurrency?.code}, target ${_state.value.targetCurrency?.code}") }
             .launchIn(viewModelScope)
+    }
 
+    /**
+     * Retrieves a fallback target currency based on a predefined order.
+     *
+     * @param sourceCurrencyCode The code of the source currency to exclude from fallback options.
+     * @param currencies The list of available currencies.
+     * @param fallbackOrder The order of fallback currencies to consider.
+     * @return The fallback target currency, or null if none is found.
+     */
+    private fun getFallbackTargetCurrency(
+        sourceCurrencyCode: String?,
+        currencies: List<CurrencyUi>,
+        fallbackOrder: List<String> = listOf("USD", "EUR")
+    ): CurrencyUi? {
+        return fallbackOrder
+            .firstNotNullOfOrNull { code ->
+                currencies.firstOrNull { it.code == code && it.code != sourceCurrencyCode }
+            }
     }
 
     /**
