@@ -1,7 +1,8 @@
-# 💱 Currency Converter – Android App
+# Currency Converter – Android App
 
-A modern, modular, and production-style **Currency Converter app** built with Kotlin, Jetpack
-Compose, and a clean multi-module architecture.
+A simple, modern **Currency Converter** Android app with offline support, built using Kotlin, Jetpack Compose, and a modular MVVM architecture.
+
+This project was developed as a personal portfolio piece to explore clean, scalable Android patterns and deliver a fully functioning Play Store app — end-to-end.
 
 ## 📸 Screenshots
 
@@ -12,23 +13,27 @@ Compose, and a clean multi-module architecture.
 
 ## ✨ Features
 
-- 🌐 Real-time exchange rate conversion using a public currency API
-- 🔁 One-tap currency swapping with remembered preferences
-- 🔄 Pull-to-refresh and automatic staleness checking
-- 🧭 Bottom navigation with screens for Rates, Converter, and Settings
-- 📱 Jetpack Compose UI with dynamic layout and theming
-- 🎌 Region flags and locale-aware currency formatting
-- 💾 Offline-first sync strategy with caching and timestamp tracking
-- 🧪 ViewModel-driven state with clean separation between domain and UI
-- 📦 Modular architecture with feature-based separation (`app`, `rates`, `converter`, etc.)
+- Real-time exchange rate conversion using a public currency API
+- Pull-to-refresh and automatic staleness checking
+- One-tap currency swapping with remembered preferences
+- Bottom navigation with screens for Rates, Converter, and Settings
+- Jetpack Compose UI with dynamic layout and theming
+- Region flags and locale-aware currency formatting
+- Offline-first sync strategy with caching and refresh timestamp tracking
+- ViewModel-driven state with clean separation between domain and UI
+- Modular architecture with feature-based separation (`app`, `rates`, `converter`, etc.)
 
 ## 🧰 Tech Stack
 
-- **Kotlin**, **Jetpack Compose**, **Coroutines**, **Flow**
-- **Koin** for dependency injection
+- **Kotlin**, **Jetpack Compose**
 - **MVVM** architecture + unidirectional data flow
-- **Room** (optional caching) or in-memory persistence
+- **Coroutines / Flow** for asynchronous logic
 - **Multi-module setup** for scalable code organization
+- **Room** for storing currency and exchange rate data
+- **DataStore** for persistent settings
+- **Retrofit** for API communication
+- **Koin** for dependency injection
+- **Firebase / Crashlytics** integration for issue detection
 
 ## 🚀 Status
 
@@ -39,22 +44,22 @@ The app is **MVP complete and live** on Google Play:<br>
   </a>
 </div>
 
-Recent improvements:
+##### Recent improvements
 
-- ✅ Tap-to-convert from currency rate list
-- ✅ Custom `CurrencyAmountField` for better input control
-- ✅ Swap button for source/target currencies in converter
-- ✅ Persisted conversion state using DataStore
-- ✅ Polished layout and modernized UI
-- ✅ Published Play Store release with final styling and visuals
+> - Integrated Firebase Analytics and Crashlytics for usage insights and error tracking
+> - Refactored data and viewmodel layers to use Kotlin Flows for reactive, lifecycle-aware data handling
+> - Introduced custom Result and Error classes to streamline error propagation across app layers
+> - App now auto-selects a base currency on first launch based on device locale
+> - Enhanced user experience with *tap-to-convert*, a *swap button* on the conversion screen, and a custom `CurrencyAmountField` for better input control
+> - Persisted user settings using Jetpack DataStore
+> - Published to the Google Play Store with polished visuals and final styling
 
-Coming later:
+##### Coming later
 
-- 🛑 Error handling with custom result class and UI surfacing
-- ⚙️ Onboarding flow (select default currency)
-- 🧪 Unit tests for error handling and sync policy
-- 📈 Charts for historical rate data
-- 🔧 CI setup with GitHub Actions
+> - Onboarding flow with ui feature introduction (press, long press)
+> - Unit tests for error handling and sync policy
+> - Charts for historical rate data
+> - CI setup with GitHub Actions
 
 ## 🔐 API Key Handling
 
