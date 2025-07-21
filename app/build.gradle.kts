@@ -7,7 +7,7 @@ plugins {
 // Version information
 val versionMajor = 0
 val versionMinor = 9
-val versionPatch = 4
+val versionPatch = 5
 
 android {
     signingConfigs {
@@ -79,6 +79,9 @@ dependencies {
 
     // Timber logging
     implementation(libs.timber)
+
+    // For determining the screen size
+    implementation(libs.androidx.window)
 
     testImplementation(libs.junit)
 
