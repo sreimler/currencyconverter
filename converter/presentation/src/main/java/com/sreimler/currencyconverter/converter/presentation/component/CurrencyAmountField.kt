@@ -22,8 +22,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import java.math.BigDecimal
 import java.math.RoundingMode
-import java.text.DecimalFormat
 import java.util.Locale
 
 enum class AmountField {
@@ -148,7 +148,7 @@ fun CurrencyAmountField(
  * Used for both input display and equality checks.
  */
 fun Double.toFixedDecimalString(fractionDigits: Int = 2): String {
-    return DecimalFormat("0.${"0".repeat(fractionDigits)}").apply {
-        roundingMode = RoundingMode.HALF_UP
-    }.format(this)
+    return BigDecimal(this.toString())
+        .setScale(fractionDigits, RoundingMode.HALF_UP)
+        .toPlainString()
 }

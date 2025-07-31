@@ -24,9 +24,18 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 configureKotlinAndroid(this)
                 configureBuildTypes(this, ExtensionType.LIBRARY)
 
+                // Set SDK versions here for all library modules
+                compileSdk = libs.findVersion("projectCompileSdkVersion").get().toString().toInt()
                 defaultConfig {
+                    minSdk = libs.findVersion("projectMinSdkVersion").get().toString().toInt()
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                     consumerProguardFiles("consumer-rules.pro")
+                }
+                testOptions {
+                    targetSdk = libs.findVersion("projectTargetSdkVersion").get().toString().toInt()
+                }
+                lint {
+                    targetSdk = libs.findVersion("projectTargetSdkVersion").get().toString().toInt()
                 }
             }
 
