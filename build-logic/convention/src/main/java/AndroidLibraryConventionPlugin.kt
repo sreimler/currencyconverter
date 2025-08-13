@@ -7,7 +7,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.kotlin
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
 
@@ -42,8 +41,12 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             dependencies {
                 "implementation"(project.libs.findLibrary("kotlinx-serialization-json").get())
                 "implementation"(project.libs.findLibrary("timber").get())
-                "testImplementation"(kotlin("test"))
                 "testImplementation"(project.libs.findLibrary("junit").get())
+                "testImplementation"(project.libs.findLibrary("mockk-android").get())
+                "testImplementation"(project.libs.findLibrary("mockk-agent").get())
+                "testImplementation"(project.libs.findLibrary("kotlinx-coroutines-test").get())
+                "testImplementation"(project.libs.findLibrary("turbine").get())
+                "testImplementation"(libs.findLibrary("timber").get())
                 "androidTestImplementation"(project.libs.findLibrary("junit").get())
                 "androidTestImplementation"(project.libs.findLibrary("androidx-junit").get())
                 "androidTestImplementation"(project.libs.findLibrary("androidx-espresso-core").get())

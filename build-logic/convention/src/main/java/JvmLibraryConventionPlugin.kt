@@ -11,7 +11,7 @@ class JvmLibraryConventionPlugin : Plugin<Project> {
             configureKotlinJvm()
 
             dependencies {
-                add("testImplementation", kotlin("test"))
+                "testImplementation"(kotlin("test"))
             }
         }
     }

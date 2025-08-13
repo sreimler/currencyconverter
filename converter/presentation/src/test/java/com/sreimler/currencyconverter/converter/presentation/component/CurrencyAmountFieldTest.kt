@@ -1,7 +1,8 @@
 package com.sreimler.currencyconverter.converter.presentation.component
 
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import kotlin.test.assertEquals
+
 
 class CurrencyAmountFieldTest {
 
