@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -60,44 +59,45 @@ class ConverterViewModel(
         val baseCurrencyFlow: Flow<CurrencyUi?> = baseCurrencyFlow(currencyRepository, _errors, errorLogger)
         val exchangeRatesFlow: Flow<List<ExchangeRateUi>> = exchangeRatesFlow(currencyRepository, _errors, errorLogger)
         val currenciesFlow: Flow<List<CurrencyUi>> = currenciesFlow(currencyRepository, _errors, errorLogger)
+        val sourceCurrencyResultFlow = currencyRepository.sourceCurrencyStream()
+        val targetCurrencyResultFlow = currencyRepository.targetCurrencyStream()
 
-        combine(baseCurrencyFlow, exchangeRatesFlow, currenciesFlow) { base, rates, currencies ->
+        combine(
+            baseCurrencyFlow,
+            exchangeRatesFlow,
+            currenciesFlow,
+            sourceCurrencyResultFlow,
+            targetCurrencyResultFlow
+        ) { base, rates, currencies, sourceResult, targetResult ->
             Timber.d("Converter received updated data")
 
-            // Retrieve and update source currency
-            val sourceResult = currencyRepository.sourceCurrencyStream().first { it !is AppResult.Loading }
-            when (sourceResult) {
-                is AppResult.Success -> {
-                    _state.update { it.copy(sourceCurrency = sourceResult.data.toCurrencyUi()) }
-                }
+            // Retrieve source currency
+            val sourceCurrency = when (sourceResult) {
+                is AppResult.Success -> sourceResult.data.toCurrencyUi()
 
                 is AppResult.Error -> {
                     if (sourceResult.error is AppError.InvalidRequest && base != null) {
                         // Source currency not set - fall back to default (base currency)
                         currencyRepository.setSourceCurrency(base.toCurrency())
-                        _state.update { it.copy(sourceCurrency = base) }
+                        base
                     } else {
                         errorLogger.log(sourceResult.error)
                         _errors.emit(sourceResult.error)
-                        return@combine
+                        null
                     }
                 }
 
-                is AppResult.Loading -> Unit
+                is AppResult.Loading -> _state.value.sourceCurrency // Keep existing while loading
             }
+            if (sourceCurrency == null) return@combine
 
-            // Retrieve and update target currency
-            val targetResult = currencyRepository.targetCurrencyStream().first { it !is AppResult.Loading }
+            // Retrieve target currency
             val fallback = getFallbackTargetCurrency(_state.value.sourceCurrency?.code, currencies)
-            val resolvedTargetCurrency = when (targetResult) {
+            val targetCurrency = when (targetResult) {
                 is AppResult.Success -> {
-                    // Check if source and target currencies are identical
-                    val targetCurrency = targetResult.data.toCurrencyUi()
-                    if (targetCurrency.code == _state.value.sourceCurrency?.code) {
-                        fallback
-                    } else {
-                        targetCurrency
-                    }
+                    Timber.d("Retrieved target currency")
+                    val target = targetResult.data.toCurrencyUi()
+                    if (target != sourceCurrency) target else fallback
                 }
 
                 is AppResult.Error -> {
@@ -107,26 +107,17 @@ class ConverterViewModel(
                     } else {
                         errorLogger.log(targetResult.error)
                         _errors.emit(targetResult.error)
-                        return@combine
+                        null
                     }
                 }
 
-                is AppResult.Loading -> null // Should not happen due to filtering above
+                is AppResult.Loading -> _state.value.targetCurrency // Keep while loading
             }
-
-            if (resolvedTargetCurrency != null) {
-                _state.update { it.copy(targetCurrency = resolvedTargetCurrency) }
-                Timber.d("Retrieved target currency")
-            } else {
-                errorLogger.log(AppError.NotFound)
-                _errors.emit(AppError.NotFound)
-                return@combine
-            }
+            if (targetCurrency == null) return@combine
 
             // Update exchange rate and state
-            val exchangeRate =
-                calculateExchangeRate(_state.value.sourceCurrency, _state.value.targetCurrency, exchangeRates = rates)
-            val targetAmount = 1.0 * exchangeRate
+            val exchangeRate = calculateExchangeRate(sourceCurrency, targetCurrency, rates)
+            val targetAmount = _state.value.sourceAmount * exchangeRate
 
             _state.update {
                 it.copy(
@@ -134,12 +125,12 @@ class ConverterViewModel(
                     currencyList = currencies,
                     exchangeRateList = rates,
                     baseCurrency = base,
+                    sourceCurrency = sourceCurrency,
+                    targetCurrency = targetCurrency,
                     exchangeRate = exchangeRate,
                     targetAmount = targetAmount
                 )
             }
-
-
         }
             .onEach { Timber.d("Updated state with latest rate and currency information - source ${_state.value.sourceCurrency?.code}, target ${_state.value.targetCurrency?.code}") }
             .launchIn(viewModelScope)
