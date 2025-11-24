@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,12 +38,12 @@ import com.sreimler.currencyconverter.core.domain.mock.CurrencyMock.CURRENCY_USD
 import com.sreimler.currencyconverter.core.domain.mock.ExchangeRateMock.EXCHANGE_RATES
 import com.sreimler.currencyconverter.core.presentation.component.CurrencyFlagImage
 import com.sreimler.currencyconverter.core.presentation.component.StyledCurrencyRow
+import com.sreimler.currencyconverter.core.presentation.component.StyledProgressIndicator
 import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.ExchangeRateUi
 import com.sreimler.currencyconverter.core.presentation.models.toCurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.toExchangeRateUi
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
-import com.sreimler.currencyconverter.core.presentation.theme.StyledProgressIndicator
 import com.sreimler.currencyconverter.core.presentation.util.toFormattedUiString
 import com.sreimler.currencyconverter.core.presentation.util.toString
 import org.koin.androidx.compose.koinViewModel
@@ -210,7 +210,7 @@ private fun CurrencyExchangeRate(currency: CurrencyUi, exchangeRate: ExchangeRat
     )
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 fun ListScreenPreview() {
     CurrencyConverterTheme {

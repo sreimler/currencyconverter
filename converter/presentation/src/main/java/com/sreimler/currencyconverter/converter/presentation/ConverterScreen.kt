@@ -46,28 +46,49 @@ import com.sreimler.currencyconverter.converter.presentation.component.CurrencyA
 import com.sreimler.currencyconverter.core.domain.mock.CurrencyMock.CURRENCY_EUR
 import com.sreimler.currencyconverter.core.domain.mock.CurrencyMock.CURRENCY_LIST
 import com.sreimler.currencyconverter.core.domain.mock.CurrencyMock.CURRENCY_USD
+import com.sreimler.currencyconverter.core.domain.util.AppError
 import com.sreimler.currencyconverter.core.presentation.component.CurrencyFlagImage
 import com.sreimler.currencyconverter.core.presentation.component.StyledCurrencyRow
+import com.sreimler.currencyconverter.core.presentation.component.StyledProgressIndicator
 import com.sreimler.currencyconverter.core.presentation.models.CurrencyUi
 import com.sreimler.currencyconverter.core.presentation.models.toCurrencyUi
 import com.sreimler.currencyconverter.core.presentation.theme.CurrencyConverterTheme
-import com.sreimler.currencyconverter.core.presentation.theme.StyledProgressIndicator
 import com.sreimler.currencyconverter.core.presentation.util.toFormattedUiString
 import com.sreimler.currencyconverter.core.presentation.util.toString
+import kotlinx.coroutines.flow.SharedFlow
 import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun ConverterScreenRoot(
+fun ConverterScreenWithViewModel(
     modifier: Modifier = Modifier,
     viewModel: ConverterViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    ConverterScreenRoot(
+        state,
+        viewModel.errors,
+        viewModel::onAmountChanged,
+        viewModel::onCurrencySelected,
+        viewModel::onSwapCurrencies,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ConverterScreenRoot(
+    state: ConverterState,
+    errors: SharedFlow<AppError>,
+    onAmountChanged: (AmountField, String) -> Unit,
+    onCurrencySelected: (AmountField, CurrencyUi) -> Unit,
+    onSwapCurrencies: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     // Display viewmodel errors as toasts
     val context = LocalContext.current
     LaunchedEffect(true) {
-        viewModel.errors.collect { error ->
+        errors.collect { error ->
             Toast.makeText(context, error.toString(context), Toast.LENGTH_SHORT).show()
         }
     }
@@ -79,9 +100,9 @@ fun ConverterScreenRoot(
     } else {
         ConverterScreen(
             state = state,
-            onAmountChanged = viewModel::onAmountChanged,
-            onCurrencySelected = viewModel::onCurrencySelected,
-            onSwapCurrencies = viewModel::onSwapCurrencies,
+            onAmountChanged = onAmountChanged,
+            onCurrencySelected = onCurrencySelected,
+            onSwapCurrencies = onSwapCurrencies,
             modifier = modifier
         )
     }
